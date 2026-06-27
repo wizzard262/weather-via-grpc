@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
+		<PackageReference Include="Google.Protobuf" Version="3.25.0" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.60.0" />
+		<PackageReference Include="Grpc.Tools" Version="2.60.0" PrivateAssets="All" />
+		<!-- Tell the project to compile .proto -->
+		<Protobuf Include="Protos\weather.proto" GrpcServices="Client" />
+		<!-- use later-->
+		<!--<Protobuf Include="Protos\weather.proto" GrpcServices="Server" />
+		<Protobuf Include="Protos\weather.proto" GrpcServices="Both" />-->		
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="Protos\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Services\" />
+	</ItemGroup>
+</Project>

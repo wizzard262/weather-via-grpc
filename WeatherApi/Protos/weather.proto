@@ -1,0 +1,24 @@
+// ste:todo: make a third shared contract project to share the *.proto files between the client and server projects.
+// This will allow both projects to reference the same proto files and avoid duplication.
+syntax = "proto3";
+
+// define the C# namespcace for the generated classes
+option csharp_namespace = "Grpc";
+
+// Request message
+message WeatherRequest {
+  double latitude = 1;
+  double longitude = 2;
+}
+
+// Response message
+message WeatherResponse {
+	double temperature_2m = 1;  
+	int32 weather_code = 2;
+	string weather_description = 3;
+}
+
+// gRPC service definition
+service WeatherService {
+  rpc GetWeather (WeatherRequest) returns (WeatherResponse);
+}

@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html>
+<body>
+    <h2>gRPC-Web Weather Test</h2>
+
+    <script type="module">
+        import { WeatherServiceClient } from './generated/weather_grpc_web_pb.js';
+        import { WeatherRequest } from './generated/weather_pb.js';
+
+        const serverAddress = "https://localhost:7108"
+        const client = new WeatherServiceClient(serverAddress);
+
+        const req = new WeatherRequest();
+        req.setLatitude(53.41);
+        req.setLongitude(-2.15);
+
+        client.getWeather(req, {}, (err, res) => {
+            if (err) {
+                console.error("gRPC error:", err);
+                return;
+            }
+
+            console.log("Response:", res.toObject());
+            document.body.innerHTML += `<pre>${JSON.stringify(res.toObject(), null, 2)}</pre>`;
+        });
+    </script>
+
+</body>
+</html>
+
+
+<!-- ste:todo: we'll come back to this later!
+
+To create the 2 required JS files: weather_grpc_web_pb.js & weather_pb.js
+
+    * download https://github.com/protocolbuffers/protobuf/releases & extract to say C:\dev\protoc
+    * we should see:
+        bin\protoc.exe
+        include\
+
+    * download https://github.com/grpc/grpc-web/releases and extract: protoc-gen-grpc-web.exe
+    (place this file in the same folder as protoc.exe)
+
+    * add to Windows PATH: C:\dev\protoc\bin or whatever
+
+    * run these commands:
+        protoc Protos/weather.proto ^
+            --js_out=import_style=commonjs:wwwroot/generated ^
+            --grpc-web_out=import_style=commonjs,mode=grpcwebtext:wwwroot/generated
+
+    * This generates:
+        wwwroot/generated/weather_pb.js
+        wwwroot/generated/weather_grpc_web_pb.js
+
+    It uses the server directly and has nothing to do with the C# Client
+ -->

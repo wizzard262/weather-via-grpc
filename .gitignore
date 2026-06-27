@@ -1,55 +1,71 @@
-# Prerequisites
-*.d
+############################
+# .NET / C# build output
+############################
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.csproj.user
+*.dbmdl
+*.jfm
 
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
+############################
+# Visual Studio / Rider
+############################
+.vs/
+.idea/
+*.swp
+*.sln.docstates
 
-# Linker output
-*.ilk
-*.map
-*.exp
+############################
+# Logs
+############################
+*.log
+logs/
 
-# Precompiled Headers
-*.gch
-*.pch
+############################
+# ASP.NET Core
+############################
+wwwroot/lib/
+wwwroot/dist/
+wwwroot/node_modules/
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
+############################
+# Node / JS tooling
+############################
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+############################
+# gRPC / Protobuf
+############################
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+# C# generated gRPC code (should NOT be committed)
+# These are regenerated automatically by MSBuild
+**/obj/**/Protos/*.cs
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
+# JS gRPC-Web generated files (optional)
+# If you want reproducible builds, ignore them.
+# If you want to serve them directly, keep them.
+wwwroot/generated/*.js
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+# Protoc tooling (if you installed locally)
+protoc/
+protoc-gen-grpc-web.exe
 
-# debug information files
-*.dwo
+############################
+# Environment / secrets
+############################
+*.env
+*.env.*
+appsettings.Development.json
+appsettings.Local.json
+
+############################
+# OS junk
+############################
+Thumbs.db
+.DS_Store

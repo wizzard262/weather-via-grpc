@@ -1,0 +1,226 @@
+﻿<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="p-3">
+        <h1>gRPC (gRPC Remote Procedure Call) - CLIENT</h1>
+        <div class="bg-secondary bg-opacity-10 p-3 border rounded">
+            <p>
+                High-performance, open-source Remote Procedure Call (RPC) framework originally developed by Google. <br />
+                It allows an application to directly call a method on a server application located on a different machine as if it were a local object,<br />
+                making it a popular choice for microservices architectures. <a href="https://grpc.io/" target="_blank">https://grpc.io/</a>
+            </p>
+            <h2>How gRPC Works</h2>
+            <ul>
+                <li>
+                    <strong>Protocol Buffers (Protobuf):</strong> <br />
+                    Instead of text-based formats like JSON, gRPC uses <b>Protobuf</b> (a binary serialization format) to define the API and serialize structured data. <br />
+                    Payload sizes significantly smaller and parsing much faster. <a href="https://protobuf.dev/" target="_blank">https://protobuf.dev/</a>
+                </li>
+                <li>
+                    <strong>HTTP/2 Transport:</strong> <br />
+                    Uses HTTP/2. Enabling multiplexing (multiple requests on a single connection), header compression, and full bidirectional streaming.
+                </li>
+                <li>
+                    <strong>Contract-First Development:</strong> <br />
+                    <ul>
+                        <li>Define the API structure, methods, and data types in a <code>.proto</code> file.</li>
+                        <li>gRPC compiler automatically generates strongly-typed client and server code. <a href="https://grpc.io/docs/languages/" target="_blank">supported languages</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <br />
+        <div class="bg-secondary bg-opacity-10 p-3 border rounded">
+            <h2>GET WEATHER Via gRPC</h2>
+            <ul>
+                <li>This is a C# API <b>WeatherApi - client</b> <i>(with this static HTML page at the root)</i> hosted on Azure at: ste:todo:</li>
+                <li>The <b>WeatherApi - client</b> endpoint calls a <b>WeatherService - server</b> via gRPC</li>
+                <li>Both <b>WeatherApi - client</b> and <b>WeatherService - server</b> in a repo at : <a href="https://github.com/wizzard262/weather-via-grpc" target="_blank">https://github.com/wizzard262/weather-via-grpc</a></li>
+                <li>
+                    <b>WeatherService - server</b>: <br />
+                    Hosted at: <a href="" target="_blank">ste:todo:</a> <br />
+                    <b>Note:</b> Operating System must be Linux
+                </li>
+                <li>
+                    The <b>WeatherService - server</b> calls the FREE (no auth, key, tokens, signup) weather API <a href="https://open-meteo.com/" target="_blank">https://open-meteo.com/</a><br />
+                    with a path like  <a href="https://api.open-meteo.com/v1/forecast?latitude=53.41&longitude=-2.15&current=temperature_2m,weather_code" target="_blank">https://api.open-meteo.com/v1/forecast?latitude=53.41&longitude=-2.15&current=temperature_2m,weather_code</a><br />
+                    <b>Note:</b> This returns 2 data items we will use:
+                    <ul>
+                        <li><b>Current temperature:</b> <code>temperature_2m</code></li>
+                        <li>
+                            <b>Weather Code:</b>
+                            <code>
+                                weather_code
+                            </code>
+                            <br />
+                            (Note: this number corresponds to a lookup. Go to: <a href="https://open-meteo.com/en/docs#weathervariables" target="_blank">https://open-meteo.com/en/docs#weathervariables</a> and search for:<i>" WMO Weather interpretation codes"</i>)
+                        </li>
+                    </ul>
+                </li>
+                <li>The <b>WeatherService - server</b> responds to the <b>WeatherApi - client</b> via gRPC</li>
+                <li>The <b>WeatherApi - client</b> deserializes the gRPC message and displays the weather result (see form below)</li>
+                <li><b>Note:</b> The returned JSON data also includes the <code>raw_protobuf</code> for reference.</li>
+                <li>
+                    The proto contract <a href="https://localhost:7034/protos/weather.proto" target="_blank">weather.proto</a> is used by both the client and the server<br />
+                    It auto-generates C# code <i>(or whatever other supported language the service might be written in)</i> <br />
+                    It defines:
+                    <ul>
+                        <li><b>Proto Schema Language version:</b> <code>syntax = "proto3";</code></li>
+                        <li>
+                            <strong>Data contract:</strong>
+                            <code>WeatherRequest</code> and <code>WeatherResponse</code> define the exact fields, types, and field numbers used for exchanging data between client and server.
+                        </li>
+                        <li>
+                            <strong>Service contract:</strong>
+                            <code>WeatherService</code> with its <code>GetWeather</code> RPC defines the API interface:
+                            <ul>
+                                <li>Method name <code>GetWeather</code></li>
+                                <li>Request type <code>WeatherRequest</code></li>
+                                <li>Response type <code>WeatherResponse</code></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Wire contract:</strong>
+                            The field numbers (<code>= 1</code>, <code>= 2</code>) and types (<code>double</code>, <code>string</code>) define the binary Protobuf wire format, ensuring compatibility across languages and versions.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <form id="weatherForm" class="border">
+                This form uses javascript to call the <b>WeatherApi - clients</b> HttpGet endpoint: <a href="/weather?latitude=53.41&longitude=-2.15" target="_blank">/weather?latitude=53.41&longitude=-2.15</a><br />
+                This then calls the <b>WeatherService - server</b> via gRPC to get the weather data
+                <table>
+                    <tr>
+                        <td>Latitude:</td>
+                        <td><input type="text" id="latitude" value="53.41"></td>
+                    </tr>
+                    <tr>
+                        <td>Longitude:</td>
+                        <td><input type="text" id="longitude" value="-2.15"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align:right;">
+                            <button type="submit">Get Weather</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align:left;">
+                            <i>(default coords is Stockport, England)</i>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <b>Get Weather result:</b>
+            <pre id="weatherResult" class="alert alert-danger"></pre>
+        </div>
+        <br />
+        <div class="bg-secondary bg-opacity-10 p-3 border rounded">
+            <h2>Protobuf Hex Deserializer</h2>
+            <p>
+                Paste the <code>raw_protobuf</code> value from "GetWeather" <i>(see above)</i> to see the hexadecimal (i.e. binary) Protobuf message deserialized
+                into the <code>WeatherResponse</code>
+            </p>
+
+            <form id="protobufForm" class="border">
+                <table>
+                    <tr>
+                        <td>Raw Protobuf Hex:</td>
+                        <td><textarea id="hexInput" rows="1" style="width: 600px;">09 CD CC CC CC CC CC 37 40 10 03 1A 08 4F 76 65 72 63 61 73 74</textarea></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align:right;">
+                            <button id="decodeBtn">Decode</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <b>Decoded JSON</b>
+            <pre id="output" class="alert alert-danger"></pre>
+        </div>
+        <br />
+        <div class="bg-secondary bg-opacity-10 p-3 border rounded">
+            <h2>Draw.io Diagram</h2>
+            <p>Click to open full size in a  new tab</p>
+            <a href="images/diagram.png">
+                <img src="images/diagram.png" width="600px;" />
+            </a>
+        </div>
+    </div>
+</body>
+</html>
+
+<!-- Loads Protobuf.js library. Enables .proto parsing, message encoding/decoding, binary/JSON conversion directly in JavaScript. -->
+<script src="https://unpkg.com/protobufjs/dist/protobuf.min.js"></script>
+
+<script>
+    // WeatherForm
+    document
+        .getElementById("weatherForm")
+        .addEventListener("submit", async (e) => {
+            // prevent the default form submission
+            e.preventDefault();
+
+            // get latitude and  longitude valuesfrom the form
+            const latitude = document.getElementById("latitude").value;
+            const longitude = document.getElementById("longitude").value;
+
+            // call the API endpoint
+            const res = await fetch(`/weather?latitude=${latitude}&longitude=${longitude}`);
+            const json = await res.json();
+
+            // print out the result
+            document.getElementById("weatherResult").textContent =
+                JSON.stringify(json, null, 2);
+        });
+
+    // convert the hex string to a Uint8Array of bytes
+    function hexToBytes(hex) {
+        hex = hex.replace(/[^0-9a-fA-F]/g, "");
+        if (hex.length % 2 !== 0) {
+            throw new Error("Hex length must be even");
+        }
+        const bytes = new Uint8Array(hex.length / 2);
+        for (let i = 0; i < hex.length; i += 2) {
+            bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+        }
+        return bytes;
+    }
+
+    // Inline .proto schema matching the WeatherResponse used in the C# API
+    const protoSource = `syntax = "proto3";
+                            message WeatherResponse {
+                                double temperature_2m = 1;
+                                int32 weather_code = 2;
+                                string weather_description = 3;
+                        }`;
+
+    // Decode the hex input to a Protobuf message and display the JSON representation
+    document
+        .getElementById("decodeBtn")
+        .addEventListener("click", async (e) => {
+            // prevent the default form submission
+            e.preventDefault();
+            const hex = document.getElementById("hexInput").value.trim();
+            const output = document.getElementById("output");
+            output.textContent = "Decoding...";
+
+            try {
+                const root = await protobuf.parse(protoSource).root;
+                const WeatherResponse = root.lookupType("WeatherResponse");
+
+                const bytes = hexToBytes(hex);
+                const message = WeatherResponse.decode(bytes);
+                const obj = WeatherResponse.toObject(message, {
+                    longs: String,
+                    enums: String,
+                    bytes: String
+                });
+
+                output.textContent = JSON.stringify(obj, null, 2);
+            } catch (err) {
+                output.textContent = "Error: " + err.message;
+            }
+        });
+</script>
