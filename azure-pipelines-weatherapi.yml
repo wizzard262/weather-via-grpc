@@ -4,7 +4,7 @@ trigger:
     - main
   paths:
     include:
-    - WeatherApi/**
+    - WeatherService/**
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -13,22 +13,22 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: 'WeatherApi/WeatherApi.csproj'
+    projects: 'WeatherService/WeatherService.csproj'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
-    projects: 'WeatherApi/WeatherApi.csproj'
+    projects: 'WeatherService/WeatherService.csproj'
     arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: 'weatherapi'
+    artifactName: 'weatherservice'
 
 # Deployment stage (App Service example)
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'AzureServiceConnection'
-    appName: 'grpc-weather-client'
+    appName: 'grpc-weather'
     package: '$(Build.ArtifactStagingDirectory)'
