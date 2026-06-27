@@ -13,6 +13,6 @@ steps:
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'AzureServiceConnection'
-    appName: '<YOUR API APP SERVICE NAME>'
+    appName: 'grpc-weather-client'
     appType: 'webAppLinux'
     package: '$(Build.ArtifactStagingDirectory)/WeatherApi'
