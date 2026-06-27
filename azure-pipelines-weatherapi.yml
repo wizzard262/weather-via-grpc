@@ -12,33 +12,18 @@ pool:
 steps:
 - task: DotNetCoreCLI@2
   inputs:
-    command: 'build'
-    projects: 'WeatherApi/WeatherApi.csproj'
-
-- task: DotNetCoreCLI@2
-  inputs:
     command: 'publish'
     projects: 'WeatherApi/WeatherApi.csproj'
-    arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
-
-# Create a single zip file
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/WeatherApi.zip'
-    replaceExistingArchive: true
+    arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/publish'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    pathToPublish: '$(Build.ArtifactStagingDirectory)/publish'
     artifactName: 'weatherapi'
 
-# Deploy the single known zip
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'AzureServiceConnection'
-    appName: 'grpc-weather'
+    appName: 'weather-api'
     appType: 'webAppLinux'
-    package: '$(Build.ArtifactStagingDirectory)/WeatherApi.zip'
+    package: '$(Build.ArtifactStagingDirectory)/publish'
