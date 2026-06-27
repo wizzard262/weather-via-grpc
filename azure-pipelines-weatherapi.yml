@@ -24,6 +24,6 @@ steps:
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'AzureServiceConnection'
-    appName: 'weather-api'
+    appName: 'grpc-weather-client'
     appType: 'webAppLinux'
     package: '$(Build.ArtifactStagingDirectory)/publish'
