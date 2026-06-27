@@ -31,4 +31,5 @@ steps:
   inputs:
     azureSubscription: 'AzureServiceConnection'
     appName: 'grpc-weather'
+    appType: 'webAppLinux'
     package: '$(Build.ArtifactStagingDirectory)'
