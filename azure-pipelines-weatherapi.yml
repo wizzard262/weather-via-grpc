@@ -29,6 +29,6 @@ steps:
 # Deployment stage (App Service example)
 - task: AzureWebApp@1
   inputs:
-    azureSubscription: 'MyServiceConnection'
-    appName: 'grpc-weather'
+    azureSubscription: 'github.com_wizzard262'
+    appName: 'grpc-weather-client'
     package: '$(Build.ArtifactStagingDirectory)'
