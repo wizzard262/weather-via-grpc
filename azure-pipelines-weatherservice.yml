@@ -29,4 +29,4 @@ steps:
     appName: 'grpc-weather-server'
     appType: 'webApp'
     package: '$(Build.ArtifactStagingDirectory)/WeatherService/publish'
-    deploymentMethod: 'msdeploy'
+    deploymentMethod: 'auto'
