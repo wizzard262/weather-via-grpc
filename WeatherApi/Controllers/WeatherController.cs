@@ -28,7 +28,7 @@ public class WeatherController : ControllerBase
 #if DEBUG
         using var channel = GrpcChannel.ForAddress("https://localhost:7110"); // the local path of the WeatherService ste:todo: make this configurable
 #else
-        using var channel = GrpcChannel.ForAddress("grpc-weather-e0efcad4b6afc6g2.ukwest-01.azurewebsites.net"); // the local path of the WeatherService ste:todo: make this configurable
+        using var channel = GrpcChannel.ForAddress("grpc-weather-server-gne4dfbpcnhqf3er.uksouth-01.azurewebsites.net"); // the local path of the WeatherService ste:todo: make this configurable
 #endif
 
         // Create client
