@@ -7,9 +7,14 @@ namespace WeatherService.Controllers;
 
 [ApiController]
 [Route("")]
-public class WeatherController(HttpClient http) : ControllerBase
+public class WeatherController : ControllerBase
 {
-    private readonly HttpClient _http = http;
+    private readonly HttpClient _http;
+
+    public WeatherController(HttpClient http)
+    {
+        _http = http;
+    }
 
     // GET / (i.e. localhost:7110/ )
     [HttpGet("")]
