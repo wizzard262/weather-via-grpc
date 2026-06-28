@@ -1,10 +1,10 @@
 trigger:
   branches:
     include:
-    - main
+      - main
   paths:
     include:
-    - WeatherService/**
+      - WeatherService/**
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -22,7 +22,7 @@ steps:
     projects: 'WeatherService/WeatherService.csproj'
     arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/WeatherService/publish'
 
-# 2. Deploy ONLY the publish folder (no wildcards)
+# 2. Deploy using RUN-FROM-FOLDER (NO ZIP DEPLOY)
 - task: AzureWebApp@1
   displayName: 'Deploy WeatherService to grpc-weather'
   inputs:
@@ -30,3 +30,4 @@ steps:
     appName: 'grpc-weather-server'
     appType: 'webApp'
     package: '$(Build.ArtifactStagingDirectory)/WeatherService/publish'
+    enableCustomDeployment: true
