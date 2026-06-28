@@ -19,7 +19,8 @@ steps:
   inputs:
     command: 'publish'
     projects: 'WeatherService/WeatherService.csproj'
-    arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/WeatherService/publish'
+    arguments: '--configuration Release --runtime win-x64 --self-contained true --output $(Build.ArtifactStagingDirectory)/WeatherService/publish'
+
 
 # 2. Create ONE zip manually
 - powershell: |
