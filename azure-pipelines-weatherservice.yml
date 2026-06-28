@@ -13,21 +13,28 @@ steps:
 - checkout: self
   clean: true
 
-# 1. Publish WeatherService
+# 1. Publish WeatherService to a guaranteed folder
 - task: DotNetCoreCLI@2
   displayName: 'Publish WeatherService (gRPC + REST)'
   inputs:
     command: 'publish'
     projects: 'WeatherService/WeatherService.csproj'
     publishWebProjects: false
-    arguments: '--configuration Release --runtime win-x64 --self-contained true --output $(Build.ArtifactStagingDirectory)/WeatherService/publish'
+    arguments: '--configuration Release --runtime win-x64 --self-contained true --output $(Build.SourcesDirectory)/publish'
 
 # 2. Create a single ZIP from the publish folder
 - powershell: |
     Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $source = "$(Build.ArtifactStagingDirectory)/publish"
+    $source = "$(Build.SourcesDirectory)/publish"
     $zip = "$(Build.ArtifactStagingDirectory)/WeatherService.zip"
+
+    if (!(Test-Path $source)) {
+        Write-Error "Publish folder not found: $source"
+        exit 1
+    }
+
     if (Test-Path $zip) { Remove-Item $zip }
+
     [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
   displayName: 'Create deployment ZIP'
 
