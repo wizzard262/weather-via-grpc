@@ -10,11 +10,10 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-# 0. Clean workspace
 - checkout: self
   clean: true
 
-# 1. Publish WeatherService into a dedicated publish folder
+# 1. Publish WeatherService
 - task: DotNetCoreCLI@2
   displayName: 'Publish WeatherService'
   inputs:
@@ -22,12 +21,7 @@ steps:
     projects: 'WeatherService/WeatherService.csproj'
     arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/WeatherService/publish'
 
-# 2. Deploy using MSDeploy (Run-From-Folder)
-#    This is the ONLY combination that:
-#    - copies files into wwwroot
-#    - avoids ZIP deploy
-#    - avoids WEBSITE_RUN_FROM_PACKAGE
-#    - avoids empty wwwroot
+# 2. Deploy using MSDeploy (NOT ZIP DEPLOY)
 - task: AzureWebApp@1
   displayName: 'Deploy WeatherService to grpc-weather'
   inputs:
@@ -35,4 +29,4 @@ steps:
     appName: 'grpc-weather-server'
     appType: 'webApp'
     package: '$(Build.ArtifactStagingDirectory)/WeatherService/publish'
-    deploymentMethod: 'auto'
+    deploymentMethod: 'msdeploy'
