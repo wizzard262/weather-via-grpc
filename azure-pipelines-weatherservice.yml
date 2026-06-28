@@ -7,7 +7,7 @@ trigger:
       - WeatherService/**
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
 
 steps:
 - checkout: self
@@ -21,7 +21,7 @@ steps:
     projects: 'WeatherService/WeatherService.csproj'
     arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/WeatherService/publish'
 
-# 2. Deploy using MSDeploy (NOT ZIP DEPLOY)
+# 2. Deploy using MSDeploy (Windows ONLY)
 - task: AzureWebApp@1
   displayName: 'Deploy WeatherService to grpc-weather'
   inputs:
