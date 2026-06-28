@@ -1,16 +1,41 @@
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - WeatherService/**
+
+pool:
+  vmImage: 'ubuntu-latest'
+
 steps:
+# 1. Clean artifact staging directory so no old ZIPs or builds remain
+- task: DeleteFiles@1
+  displayName: 'Clean artifact staging directory'
+  inputs:
+    SourceFolder: '$(Build.ArtifactStagingDirectory)'
+    Contents: '**'
+    RemoveSourceFolder: false
+
+# 2. Publish ONLY WeatherService into its own folder
 - task: DotNetCoreCLI@2
+  displayName: 'Publish WeatherService'
   inputs:
     command: 'publish'
     projects: 'WeatherService/WeatherService.csproj'
     arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/WeatherService'
 
+# 3. (Optional) Publish that folder as a build artifact
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish WeatherService artifact'
   inputs:
     pathToPublish: '$(Build.ArtifactStagingDirectory)/WeatherService'
     artifactName: 'weatherservice'
 
+# 4. Deploy ONLY the WeatherService publish folder to the Linux App Service
 - task: AzureWebApp@1
+  displayName: 'Deploy WeatherService to grpc-weather'
   inputs:
     azureSubscription: 'AzureServiceConnection'
     appName: 'grpc-weather'
