@@ -15,25 +15,25 @@ steps:
 
 # 1. Publish WeatherService
 - task: DotNetCoreCLI@2
-  displayName: 'Publish WeatherService'
+  displayName: 'Publish WeatherService (gRPC + REST)'
   inputs:
     command: 'publish'
     projects: 'WeatherService/WeatherService.csproj'
+    publishWebProjects: false
     arguments: '--configuration Release --runtime win-x64 --self-contained true --output $(Build.ArtifactStagingDirectory)/WeatherService/publish'
 
-
-# 2. Create ONE zip manually
+# 2. Create a single ZIP from the publish folder
 - powershell: |
     Add-Type -AssemblyName System.IO.Compression.FileSystem
-    [System.IO.Compression.ZipFile]::CreateFromDirectory(
-        "$(Build.ArtifactStagingDirectory)/WeatherService/publish",
-        "$(Build.ArtifactStagingDirectory)/WeatherService.zip"
-    )
-  displayName: 'Create single ZIP'
+    $source = "$(Build.ArtifactStagingDirectory)/publish"
+    $zip = "$(Build.ArtifactStagingDirectory)/WeatherService.zip"
+    if (Test-Path $zip) { Remove-Item $zip }
+    [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
+  displayName: 'Create deployment ZIP'
 
-# 3. Deploy that ONE zip
+# 3. Deploy the ZIP to Azure App Service
 - task: AzureWebApp@1
-  displayName: 'Deploy single ZIP to grpc-weather'
+  displayName: 'Deploy WeatherService ZIP to grpc-weather-server'
   inputs:
     azureSubscription: 'AzureServiceConnection'
     appName: 'grpc-weather-server'
