@@ -10,23 +10,23 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-# 0. Clean repo and workspace so nothing stale survives
+# 0. Clean workspace
 - checkout: self
   clean: true
 
-# 1. Publish ONLY WeatherService into a dedicated folder
+# 1. Publish WeatherService into a dedicated publish folder
 - task: DotNetCoreCLI@2
   displayName: 'Publish WeatherService'
   inputs:
     command: 'publish'
     projects: 'WeatherService/WeatherService.csproj'
-    arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/WeatherService'
+    arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/WeatherService/publish'
 
-# 2. Deploy the published contents to grpc-weather (folder deploy)
+# 2. Deploy ONLY the publish folder (no wildcards)
 - task: AzureWebApp@1
   displayName: 'Deploy WeatherService to grpc-weather'
   inputs:
     azureSubscription: 'AzureServiceConnection'
     appName: 'grpc-weather'
     appType: 'webAppLinux'
-    package: '$(Build.ArtifactStagingDirectory)/WeatherService/**'
+    package: '$(Build.ArtifactStagingDirectory)/WeatherService/publish'
