@@ -25,9 +25,14 @@ N.B. Before this class can compile, you must:
  */
 public class GrpcService
 {
-    public class WeatherGrpcService(HttpClient http) : WeatherService.WeatherServiceBase
+    public class WeatherGrpcService : WeatherService.WeatherServiceBase
     {
-        private readonly HttpClient _http = http;
+        private readonly HttpClient _http;
+
+        public WeatherGrpcService(HttpClient http)
+        {
+            _http = http;
+        }
 
         public override async Task<WeatherResponse> GetWeather(WeatherRequest request, ServerCallContext context)
         {
