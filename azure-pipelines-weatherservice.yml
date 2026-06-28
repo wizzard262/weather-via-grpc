@@ -13,37 +13,20 @@ steps:
 - checkout: self
   clean: true
 
-# 1. Publish to ArtifactStagingDirectory (NOT SourcesDirectory)
+# 1. Publish WeatherService to ArtifactStagingDirectory
 - task: DotNetCoreCLI@2
-  displayName: 'Publish WeatherService'
+  displayName: 'Publish WeatherService (no zip)'
   inputs:
     command: 'publish'
     projects: 'WeatherService/WeatherService.csproj'
     publishWebProjects: false
     arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/publish'
 
-# 2. Zip the publish output
-- powershell: |
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $source = "$(Build.ArtifactStagingDirectory)/publish"
-    $zip = "$(Build.ArtifactStagingDirectory)/WeatherService.zip"
-
-    if (!(Test-Path $source)) {
-        Write-Error "Publish folder not found: $source"
-        exit 1
-    }
-
-    if (Test-Path $zip) { Remove-Item $zip }
-
-    [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
-  displayName: 'Create deployment ZIP'
-
-# 3. Deploy using ZipDeploy
+# 2. Deploy the published folder directly (WebDeploy)
 - task: AzureWebApp@1
-  displayName: 'Deploy WeatherService ZIP'
+  displayName: 'Deploy WeatherService (folder deploy)'
   inputs:
     azureSubscription: 'AzureServiceConnection'
     appName: 'grpc-weather-server'
     appType: 'webApp'
-    deploymentMethod: 'zipDeploy'
-    package: '$(Build.ArtifactStagingDirectory)/WeatherService.zip'
+    package: '$(Build.ArtifactStagingDirectory)/publish'
