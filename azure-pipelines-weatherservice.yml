@@ -45,4 +45,5 @@ steps:
     azureSubscription: 'AzureServiceConnection'
     appName: 'grpc-weather-server'
     appType: 'webApp'
+    deploymentMethod: 'zipDeploy'
     package: '$(Build.ArtifactStagingDirectory)/WeatherService.zip'
