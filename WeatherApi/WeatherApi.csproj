@@ -13,7 +13,7 @@
 		<Protobuf Include="Protos\weather.proto" GrpcServices="Client" />
 		<!-- use later-->
 		<!--<Protobuf Include="Protos\weather.proto" GrpcServices="Server" />
-		<Protobuf Include="Protos\weather.proto" GrpcServices="Both" />-->		
+		<Protobuf Include="Protos\weather.proto" GrpcServices="Both" />-->
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="Protos\**\*.*">
@@ -22,7 +22,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Controllers\" />
-	  <Folder Include="Services\" />
+		<Folder Include="Services\" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="web.config" CopyToOutputDirectory="Always" />

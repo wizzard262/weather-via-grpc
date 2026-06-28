@@ -12,8 +12,13 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Protos\" />
+	</ItemGroup>
+	<ItemGroup>
 		<Folder Include="Controllers\" />
 	</ItemGroup>
+	<PropertyGroup>
+		<PublishTrimmed>false</PublishTrimmed>
+	</PropertyGroup>
 	<ItemGroup>
 		<Protobuf Include="Protos\weather.proto" GrpcServices="Server" />
 	</ItemGroup>
