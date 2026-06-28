@@ -27,6 +27,6 @@ steps:
   displayName: 'Deploy WeatherService to grpc-weather'
   inputs:
     azureSubscription: 'AzureServiceConnection'
-    appName: 'grpc-weather-service'
+    appName: 'grpc-weather-server'
     appType: 'webAppLinux'
     package: '$(Build.ArtifactStagingDirectory)/WeatherService/publish'
