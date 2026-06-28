@@ -21,4 +21,7 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
+	<ItemGroup>
+		<None Include="web.config" CopyToOutputDirectory="Always" />
+	</ItemGroup>
 </Project>

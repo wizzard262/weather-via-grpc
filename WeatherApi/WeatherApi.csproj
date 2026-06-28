@@ -23,4 +23,7 @@
 	<ItemGroup>
 	  <Folder Include="Services\" />
 	</ItemGroup>
+	<ItemGroup>
+		<None Include="web.config" CopyToOutputDirectory="Always" />
+	</ItemGroup>
 </Project>
