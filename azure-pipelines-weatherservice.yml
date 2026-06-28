@@ -10,11 +10,11 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-# 0. FULL WORKSPACE CLEAN — this is the critical fix
+# 0. FULL WORKSPACE CLEAN
 - checkout: self
   clean: true
 
-# 1. Publish ONLY WeatherService into its own folder
+# 1. Publish ONLY WeatherService
 - task: DotNetCoreCLI@2
   displayName: 'Publish WeatherService'
   inputs:
@@ -22,14 +22,7 @@ steps:
     projects: 'WeatherService/WeatherService.csproj'
     arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/WeatherService'
 
-# 2. Publish ONLY that folder as the artifact
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish WeatherService artifact'
-  inputs:
-    pathToPublish: '$(Build.ArtifactStagingDirectory)/WeatherService'
-    artifactName: 'weatherservice'
-
-# 3. Deploy ONLY the WeatherService publish folder
+# 2. Deploy ONLY WeatherService (NO ARTIFACT STEP)
 - task: AzureWebApp@1
   displayName: 'Deploy WeatherService to grpc-weather'
   inputs:
