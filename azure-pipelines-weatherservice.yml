@@ -21,12 +21,20 @@ steps:
     projects: 'WeatherService/WeatherService.csproj'
     arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/WeatherService/publish'
 
-# 2. Deploy using MSDeploy (Windows ONLY)
+# 2. Create ONE zip manually
+- powershell: |
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    [System.IO.Compression.ZipFile]::CreateFromDirectory(
+        "$(Build.ArtifactStagingDirectory)/WeatherService/publish",
+        "$(Build.ArtifactStagingDirectory)/WeatherService.zip"
+    )
+  displayName: 'Create single ZIP'
+
+# 3. Deploy that ONE zip
 - task: AzureWebApp@1
-  displayName: 'Deploy WeatherService to grpc-weather'
+  displayName: 'Deploy single ZIP to grpc-weather'
   inputs:
     azureSubscription: 'AzureServiceConnection'
     appName: 'grpc-weather-server'
     appType: 'webApp'
-    package: '$(Build.ArtifactStagingDirectory)/WeatherService/publish'
-    deploymentMethod: 'auto'
+    package: '$(Build.ArtifactStagingDirectory)/WeatherService.zip'
