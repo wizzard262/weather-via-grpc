@@ -8,7 +8,7 @@ namespace WeatherApi.Controllers;
 
 [ApiController]
 [Route("")]
-public class WeatherController : ControllerBase
+public class WeatherController(IConfiguration config) : ControllerBase
 {
     // shows the index.html page describing the project and how to use it
     // also has a form that send a GET request with LAT & LNG to /weather endpoint below
@@ -24,14 +24,18 @@ public class WeatherController : ControllerBase
     [HttpGet("weather")]
     public async Task<IActionResult> GetWeather(double latitude, double longitude)
     {
-        // Create channel
-#if DEBUG
-        using var channel = GrpcChannel.ForAddress("https://localhost:7110"); // the local path of the WeatherService ste:todo: make this configurable
-#else
-        using var channel = GrpcChannel.ForAddress("grpc-weather-server-gne4dfbpcnhqf3er.uksouth-01.azurewebsites.net"); // the local path of the WeatherService ste:todo: make this configurable
-#endif
+        // Note that we must specify the port number because the WeatherService is running on that port in Azure Container Apps.
+        // If we don't specify the port number, the request will use the HTTPS defualt of 443, and fail with a 404 error unless ACA ingress is mapped to 443.
+        // The port to be used for gRPC is 5000 by convention in .NET/ASP.NET Core. Most languages use 50051 by convention.
+//        var url = "grpc-weather-server-gne4dfbpcnhqf3er.uksouth-01.azurewebsites.net:50051";
+//#if DEBUG
+//        url = "https://localhost:7110"; // the local path of the WeatherService ste:todo: make url configurable
+//#endif
+//        var channel = GrpcChannel.ForAddress("https://localhost:7110"); // the local path of the WeatherService ste:todo: make this configurable
 
         // Create client
+        var url = config["GrpcServerAddress"];
+        var channel = GrpcChannel.ForAddress(url);
         var client = new WeatherServiceClient(channel);
 
         // Build request
