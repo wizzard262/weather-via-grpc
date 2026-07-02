@@ -1,5 +1,6 @@
-using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 
 //========= BUILDER =========
 var builder = WebApplication.CreateBuilder(args);
@@ -10,8 +11,15 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 //========= WEB APPLICATION =========
 var app = builder.Build();
 
-// Redirect HTTP --> HTTPS
-app.UseHttpsRedirection();
+// IMPORTANT: Remove HTTPS redirection for gRPC in Production
+// gRPC over HTTPS already works automatically.
+// But UseHttpsRedirection breaks gRPC because it downgrades HTTP/2 to HTTP/1.1.
+// In ACA, you do NOT need this — ACA terminates TLS at the front door.
+// Comment it out or delete it.
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Serve wwwroot
 app.UseStaticFiles();
