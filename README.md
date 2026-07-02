@@ -138,12 +138,66 @@ With Docker Container running:
 
 
 ## 7. Azure Container Apps setup
- -Tag the image for your registry and push it to the Azure Container Registry (ACR)
-	In Azure Container Apps, set:
-	Ingress port: 5000
-	Transport: HTTP/2
-	Your gRPC client will connect to the ACA URL without specifying a port.
 
+### Step 0 — First we need to create ACR and ACA on Azure
+
+### Step 1 — Push your image to Azure Container Registry (ACR)
+
+Tag your local image:
+`docker tag weather-service:latest <youracr>.azurecr.io/weather-service:latest`
+Push it to ?
+`docker push <youracr>.azurecr.io/weather-service:latest`
+This publishes your container image so Azure Container Apps can pull it.
+
+### Step 2 — Create an Azure Container App (ACA) using your ACR image
+Configure the Container App to use your ACR image:  
+ - Registry: your ACR  
+ - ContainerImage:`<youracr>.azurecr.io/weather-service:latest`
+
+ACA will:  
+
+	- pull your image
+	- run it inside a Linux container
+	- expose port 5000 via HTTPS
+	- optionally expose REST on 7010 internally
+	- handle scaling, revisions, logs, metrics
+
+### Step 3 — Configure Ingress
+Set ingress to match your gRPC port:
+
+	 - Ingress port: 5000
+	 - Transport: HTTP/2
+	 - Ingress type: External (public)
+
+ACA maps:
+
+`https://<your-app-name>.<region>.azurecontainerapps.io → container port 5000`
+
+Your gRPC client connects to the ACA URL without specifying a port.
+
+Step 4 — Set environment variables in ACA
+Production configuration goes in ACA, not in your Dockerfile.
+
+Examples:
+```
+ASPNETCORE_ENVIRONMENT = Production
+OPEN_METEO_URL = https://api.open-meteo.com/v1/forecast
+```
+ACA injects these at runtime.
+
+### Step 5 — View Logs
+ACA provides built‑in logging:
+
+- Container stdout/stderr
+- Kestrel startup logs
+- port binding logs
+- gRPC request logs
+- REST request logs
+
+These logs look exactly like your local Docker logs because ACA runs the same container image.
+
+---
+---
 
 **TODO: When the ACA and ARC setup update:**
 draw.io paths & layout, the devops wiki page, the 2 index.html files
