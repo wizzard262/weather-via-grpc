@@ -152,4 +152,4 @@ With Docker Container running:
 - The SERVER: **WeatherService - ContainerImage** needs to go to an ACR (Azure Container Registry).
 - An ACA (Azure Container App) needs to run the ACR **WeatherService - ContainerImage**
 
-**For this see the sibling file: [README.2](README.2)**
+**For this see the sibling file: [README.2](README2.md)**
