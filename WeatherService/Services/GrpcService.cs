@@ -23,6 +23,7 @@ N.B. Before this class can compile, you must:
             Contains the gRPC service plumbing: WeatherServiceBase (server) and WeatherServiceClient (client).
             Defines RPC method bindings and descriptors for GetWeather.
  */
+
 public class GrpcService
 {
     public class WeatherGrpcService : WeatherService.WeatherServiceBase
