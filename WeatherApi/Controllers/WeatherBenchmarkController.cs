@@ -91,8 +91,6 @@ namespace WeatherApi.Controllers
     <h1>gRPC vs REST Benchmark</h1>
     This hits empty endpoints that echo back the Weather JSON object (so as to remove time calling the open-meteo API)<br/>
     Each is hit 100 times.</br>
-    BUT! Both locally in Visual Studio and on Azure the differnce between HTTP REST and gRPC is smal and eiter can be faster.<br/>
-    Ste:TODO: Investigate why gRPC is not faster than REST in this benchmark.
     <table>
         <tr>
             <th>Protocol</th>
@@ -107,6 +105,30 @@ namespace WeatherApi.Controllers
             <td class=""fast"">{grpcMs} ms</td>
         </tr>
     </table>
+    BUT Both locally in Visual Studio and on Azure the differnce between HTTP REST and gRPC is tiny and either can be faster.<br/>
+    It seems were just measuring network latency, the workload and DTO are so small the gRPC overhead is not significant.<BR/>
+    gRPC is faster because:
+    <ul>
+        <li>Protobuf is smaller</li>
+        <li>Protobuf is faster to serialize</li>
+        <li>HTTP/2 multiplexes</li>
+        <li>No JSON parsing</li>
+        <li>No HTTP/1.1 head‑of‑line blocking</li>
+    </ul>
+    
+    To see a bigger difference, we need to benchmark a more complex workload with larger payloads and more CPU work.<br\>
+    For example, if the server is doing some CPU intensive work (e.g. image processing) or the payload is large (e.g. 1MB JSON vs 100KB Protobuf),<br\>
+    then gRPC will be significantly faster than REST.<br/>
+    STE:TODO: Mimic a more complex workload and benchmark it. Adding parallelism would be most significant.
+    <ul>
+        <li>JSON serialization cost</li>
+        <li>Protobuf serialization cost</li>
+        <li>HTTP/1.1 head‑of‑line blocking</li>
+        <li>HTTP/2 multiplexing</li>
+        <li>CPU work</li>
+        <li>payload size</li>
+        <li>parallelism (many requests over one connection)</li>
+    </ul>
 </body>
 </html>";
 
