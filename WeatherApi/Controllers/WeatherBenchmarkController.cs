@@ -10,7 +10,7 @@ namespace WeatherApi.Controllers
     [Route("[controller]")]
     public class WeatherBenchmarkController(IConfiguration config) : ControllerBase
     {
-        private readonly string _restBaseUrl = config["HttpRestServerAddress"];  // REST server (https) //ste:todo: move to 
+        private readonly string _restBaseUrl = config["HttpRestServerAddress"];  // REST server (https)
         private readonly string _grpcBaseUrl = config["GrpcServerAddress"];    // gRPC server (http)
 
         [HttpGet]
