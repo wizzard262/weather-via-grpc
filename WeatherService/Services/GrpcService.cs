@@ -30,6 +30,7 @@ public class GrpcService
     {
         private readonly HttpClient _http;
 
+        // Dont allow this to refactor to use primary constructor, potentially its an issue
         public WeatherGrpcService(HttpClient http)
         {
             _http = http;
@@ -37,17 +38,16 @@ public class GrpcService
 
         public override async Task<WeatherResponse> GetWeather(WeatherRequest request, ServerCallContext context)
         {
+            Console.WriteLine("1. gRPC WeatherRequest received");
             var weatherService = new OpenMeteoService(_http);
             var result = await weatherService.GetWeatherAsync(request.Latitude, request.Longitude);
-
+            Console.WriteLine("2. gRPC WeatherRequest result received");
             if (result is null)
             {
+                Console.WriteLine("3. gRPC WeatherRequest result unsuccessful");
                 throw new RpcException(new Status(StatusCode.NotFound, "Weather data not found"));
             }
-
-            //string description = Enum.IsDefined(typeof(WeatherCode), result.Current.Weather_Code)
-            //    ? Enum.GetName(typeof(WeatherCode), result.Current.Weather_Code)!
-            //    : "Unknown";
+            Console.WriteLine("3. gRPC WeatherRequest result successful");
 
             return new WeatherResponse
             {

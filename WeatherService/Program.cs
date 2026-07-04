@@ -5,6 +5,8 @@ using static WeatherService.Services.GrpcService;
 //=============== BUILDER ==========================
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddConsole();
+
 // Configure Kestrel to listen on port 5000
 builder.WebHost.ConfigureKestrel(options =>
 {
