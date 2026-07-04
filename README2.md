@@ -69,10 +69,11 @@ Azure Portal --> search Container Apps  --> Click Create --> Container App
 - CPU and memory  -> choose min: 0.25 CPU cores, 0.5 Gi memory 
 	
 Container App **container-app-weather** created.  
-
-Azure Portal --> Container App **container-app-weather**  --> Overview.  
-Application Url: https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/    
-
+- Azure Portal --> Container App **container-app-weather**  --> Overview --> Application Url:  
+  https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/    
+- Azure Portal --> Container App **container-app-weather**  --> Application --> Scale --> Min Replicas:0  
+  *Must set scale-to-zero so the Container will go to sleep and cost almost nothing*
+  
 #### Setup ACA Ingress
 
 Azure Portal --> Container App **container-app-weather**  --> Networking --> Ingress --> Tick Ingress box.
