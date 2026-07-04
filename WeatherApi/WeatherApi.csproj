@@ -11,18 +11,11 @@
 		<PackageReference Include="Grpc.Tools" Version="2.60.0" PrivateAssets="All" />
 		<!-- Tell the project to compile .proto -->
 		<Protobuf Include="Protos\weather.proto" GrpcServices="Client" />
-		<!-- use later-->
-		<!--<Protobuf Include="Protos\weather.proto" GrpcServices="Server" />
-		<Protobuf Include="Protos\weather.proto" GrpcServices="Both" />-->
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="Protos\**\*.*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="Controllers\" />
-		<Folder Include="Services\" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="web.config" CopyToOutputDirectory="Always" />

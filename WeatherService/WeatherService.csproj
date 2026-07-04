@@ -9,9 +9,8 @@
 		<PackageReference Include="Grpc.Core" Version="2.46.6" />
 		<PackageReference Include="Grpc.AspNetCore" Version="2.61.0" />
 		<PackageReference Include="Grpc.AspNetCore.Web" Version="2.61.0" />
-	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="Protos\" />
+		<!-- Tell the project to compile .proto -->
+		<Protobuf Include="Protos\weather.proto" GrpcServices="Server" />
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Controllers\" />
@@ -19,14 +18,6 @@
 	<PropertyGroup>
 		<PublishTrimmed>false</PublishTrimmed>
 	</PropertyGroup>
-	<ItemGroup>
-		<Protobuf Include="Protos\weather.proto" GrpcServices="Server" />
-	</ItemGroup>
-	<ItemGroup>
-		<None Update="Protos\weather.proto">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
 	<ItemGroup>
 		<None Include="web.config" CopyToOutputDirectory="Always" />
 	</ItemGroup>

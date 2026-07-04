@@ -6,36 +6,49 @@ overhead using two minimal echo endpoints.
 
 ----
 
-# 1. Create Two Endpoints (No External Calls)
+# 1. Create Two Endpoints (No External Calls) in WeatherService
 
 
 ### REST (HTTP/1.1 + JSON)
+
+A trivial echo endpoint using existing Weather model:
 ```
-app.MapGet("/echo-int", (int value) => new { value });
+app.MapGet("/weather-echo", (double latitude, double longitude) =>
+{
+    return new
+    {
+        temperature_2m = 0.0,
+        weather_code = 0,
+        weather_description = "OK",
+        latitude,
+        longitude
+    };
+});
 ```
 
 ### gRPC (HTTP/2 + Protobuf)
 
+Add a new service definition into 'weather.proto' (on Client and Server)
 ```
-message EchoIntRequest { int32 value = 1; }
-message EchoIntResponse { int32 value = 1; }
+ // New minimal echo endpoint
+  rpc EchoWeather (google.protobuf.Empty) returns (WeatherResponse);
+```
 
-service EchoService {
-  rpc EchoInt(EchoIntRequest) returns (EchoIntResponse);
-}
-
-Server handler:
-public override Task<EchoIntResponse> EchoInt(EchoIntRequest request, ServerCallContext context)
+Add a new endpoint to the **GrpcService**
+```
+public override Task<WeatherResponse> EchoWeather(Google.Protobuf.WellKnownTypes.Empty request, ServerCallContext context)
 {
-    return Task.FromResult(new EchoIntResponse { Value = request.Value });
+    return Task.FromResult(new WeatherResponse
+    {
+        Temperature2M = 0,
+        WeatherCode = 0,
+        WeatherDescription = "OK"
+    });
 }
 ```
 
-Both endpoints isolate pure protocol overhead :
-- no external API calls  
-- no logging  
-- no EF Core  
-- minimal serialization
+Both endpoints isolate pure protocol overhead:  
+No external API calls, logging, EF Core  
 
 ---
 
@@ -72,7 +85,7 @@ var sw = new Stopwatch();
 sw.Start();
 for (int i = 0; i < 100; i++)
 {
-    var result = await client.GetAsync($"{baseUrl}/echo-int?value=123");
+    var result = await client.GetAsync($"{baseUrl}/weather-echo?latitude=53.0&longitude=-2.0");
     await result.Content.ReadAsStringAsync();
 }
 sw.Stop();
@@ -91,7 +104,11 @@ var sw2 = new Stopwatch();
 sw2.Start();
 for (int i = 0; i < 100; i++)
 {
-    await grpc.EchoIntAsync(new EchoIntRequest { Value = 123 });
+     await grpc.GetWeatherAsync(new WeatherRequest
+    {
+        Latitude = 53.0,
+        Longitude = -2.0
+    });
 }
 sw2.Stop();
 

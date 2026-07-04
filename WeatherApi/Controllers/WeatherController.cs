@@ -27,7 +27,7 @@ public class WeatherController(IConfiguration config) : ControllerBase
         // Note that we must specify the port number because the WeatherService is running on that port in Azure Container Apps.
         // If we don't specify the port number, the request will use the HTTPS defualt of 443, and fail with a 404 error unless ACA ingress is mapped to 443.
         // The port to be used for gRPC is 5000 by convention in .NET/ASP.NET Core (Most languages use 50051 by convention).
-        //  e.g. "https://grpc-weather-server-xxx.uksouth-01.azurewebsites.net:50000" or "https://localhost:50000"
+        //  e.g. "https://grpc-weather-server-xxx.uksouth-01.azurewebsites.net:50000" or "http://localhost:50000"
         var url = config["GrpcServerAddress"];
 
         // Create client

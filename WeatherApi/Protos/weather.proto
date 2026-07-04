@@ -5,6 +5,8 @@ syntax = "proto3";
 // define the C# namespcace for the generated classes
 option csharp_namespace = "Grpc";
 
+import "google/protobuf/empty.proto";
+
 // Request message
 message WeatherRequest {
   double latitude = 1;
@@ -13,12 +15,15 @@ message WeatherRequest {
 
 // Response message
 message WeatherResponse {
-	double temperature_2m = 1;  
-	int32 weather_code = 2;
-	string weather_description = 3;
+  double temperature_2m = 1;  
+  int32 weather_code = 2;
+  string weather_description = 3;
 }
 
 // gRPC service definition
 service WeatherService {
   rpc GetWeather (WeatherRequest) returns (WeatherResponse);
+
+// New minimal echo endpoint, for speed test
+rpc EchoWeather (google.protobuf.Empty) returns (WeatherResponse);
 }

@@ -41,9 +41,10 @@ Image pushed to Azure ACR.
   
   
 ##### Redeploy Server image after code change
-
+- Open Docker.Desktop to start the Docker Engine.
 - Re-publish the C# Code in Visual Studio to local file system, then run in Admin Powershell:  
 *(changing the version v2 to: v3, v4, etc)*
+
 ```
 cd C:\DEV\Repositories\GitHub\weather-via-grpc\WeatherService\
 docker build -t weather-service .

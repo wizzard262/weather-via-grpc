@@ -30,7 +30,7 @@ provider.Mappings[".proto"] = "text/plain";
 // get proto path
 var protosPath = Path.Combine(Directory.GetCurrentDirectory(), "Protos");
 
-// Serve the Protos folder
+// Serve the Protos folder so we can see the proto in the browser at: /protos/weather.proto
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(protosPath),

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Net;
+using WeatherService.Models;
 using static WeatherService.Services.GrpcService;
 
 //=============== BUILDER ==========================
@@ -49,6 +50,12 @@ app.MapControllers();
 
 // REST endpoint (HTTP/1.1) - ping endpoint to check if the server is alive
 app.MapGet("/ping", () => "Server is alive");
+
+// REST endpoint (HTTP/1.1) - endpoint echoes empty CurrentData DTO, for speed test.
+app.MapGet("/weather-echo", (double latitude, double longitude) =>
+{
+    return CurrentDataInstance.CurrentData;
+});
 
 // Map gRPC ensure it stays on HTTP/2
 app.MapGrpcService<WeatherGrpcService>().EnableGrpcWeb();

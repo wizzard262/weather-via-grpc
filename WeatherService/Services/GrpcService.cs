@@ -1,5 +1,6 @@
 ﻿namespace WeatherService.Services;
 
+using Google.Protobuf.WellKnownTypes;
 using Grpc;
 using Grpc.Core;
 
@@ -36,6 +37,7 @@ public class GrpcService
             _http = http;
         }
 
+        // endpoint : /WeatherService/GetWeather
         public override async Task<WeatherResponse> GetWeather(WeatherRequest request, ServerCallContext context)
         {
             Console.WriteLine("1. gRPC WeatherRequest received");
@@ -55,6 +57,17 @@ public class GrpcService
                 WeatherCode = result.Current.Weather_Code,
                 WeatherDescription = result.Current.Weather_Description
             };
+        }
+
+        // endpoint : /WeatherService/EchoWeather
+        public override Task<WeatherResponse> EchoWeather(Empty request, ServerCallContext context)
+        {
+            return Task.FromResult(new WeatherResponse
+            {
+                Temperature2M = 0,
+                WeatherCode = 0,
+                WeatherDescription = "OK"
+            });
         }
     }
 }
