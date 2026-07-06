@@ -5,14 +5,20 @@
 <body>
     <div class="p-3">
         <h1>gRPC (gRPC Remote Procedure Call) - CLIENT</h1>
-        <a href="/weatherbenchmark" target="_blank">Run gRPC vs. HTTP REST Benchmark</a>
+
+
         <div class="bg-secondary bg-opacity-10 p-3 border rounded">
+            <h2>Benchmark gRPC vs. HTTP REST</h2>
+            <a href="/weatherbenchmark" target="_blank"> Run gRPC vs. HTTP REST Benchmark</a>
+        </div>
+        <br />
+        <div class="bg-secondary bg-opacity-10 p-3 border rounded">
+            <h2>How gRPC Works</h2>
             <p>
                 High-performance, open-source Remote Procedure Call (RPC) framework originally developed by Google. <br />
                 It allows an application to directly call a method on a server application located on a different machine as if it were a local object,<br />
                 making it a popular choice for microservices architectures. <a href="https://grpc.io/" target="_blank">https://grpc.io/</a>
             </p>
-            <h2>How gRPC Works</h2>
             <ul>
                 <li>
                     <strong>Protocol Buffers (Protobuf):</strong> <br />
@@ -40,7 +46,7 @@
                 <li>Hosted on Azure at: <a href="https://grpc-weather-client-hhfmhrbhemavfte3.uksouth-01.azurewebsites.net" target="_blank">grpc-weather-client-hhfmhrbhemavfte3.uksouth-01.azurewebsites.net</a> (Windows OS)</li>
                 <li>The <b>WeatherApi - client</b> endpoint calls a <b>WeatherService - server</b> via gRPC</li>
                 <li><b>WeatherService - server</b> hosted at: <a href="https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/" target="_blank">https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/</a> (in a Container App)</li>
-                <li>Both <b>WeatherApi - client</b> and <b>WeatherService - server</b> built & deployed from AzureDevOps at: <a href="https://dev.azure.com/jones-steve/GprcWeather/_build">https://dev.azure.com/jones-steve/GprcWeather/_build</a></li>
+                <li>Both <b>WeatherApi - client</b> and <b>WeatherService - server</b> built & deployed from AzureDevOps at: <a href="https://dev.azure.com/jones-steve/GprcWeather/_build" target="_blank">https://dev.azure.com/jones-steve/GprcWeather/_build</a></li>
                 <li>Both <b>WeatherApi - client</b> and <b>WeatherService - server</b> in a repo at : <a href="https://github.com/wizzard262/weather-via-grpc" target="_blank">https://github.com/wizzard262/weather-via-grpc</a></li>
                 <li>
                     The <b>WeatherService - server</b> calls the FREE (no auth, key, tokens, signup) weather API <a href="https://open-meteo.com/" target="_blank">https://open-meteo.com/</a><br />
@@ -89,7 +95,7 @@
             </ul>
             <form id="weatherForm" class="border">
 
-                <b>N.B.</b> Ping the server to see it is alive<a href="https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/ping">https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/ping</a>.<br />
+                <b>N.B.</b> Ping the server to see it is alive: <a href="https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/ping" target="_blank">https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/ping</a>.<br />
                 If it is asleep this HTTP GET endpoint will wake it up.<br />
                 If it is asleep a gRPC call will not wake it up and will fail.<br /><br />
 
@@ -147,8 +153,8 @@
         <div class="bg-secondary bg-opacity-10 p-3 border rounded">
             <h2>Draw.io Diagram</h2>
             <p>Click to open full size in a  new tab</p>
-            <a href="images/diagram.png">
-                <img src="images/diagram.png" width="600px;" />
+            <a href="images/diagram.png" target="_blank">
+                <img src="images/diagram.png" width="600px" />
             </a>
         </div>
     </div>
