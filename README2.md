@@ -46,6 +46,7 @@ Image pushed to Azure ACR.
 *(changing the version v2 to: v3, v4, etc)*
 
 ```
+az acr login --name containerregistryweather
 cd C:\DEV\Repositories\GitHub\weather-via-grpc\WeatherService\
 docker build -t weather-service .
 docker tag weather-service containerregistryweather.azurecr.io/weather-service:v2
