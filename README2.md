@@ -118,4 +118,8 @@ These logs look exactly like local Docker logs because ACA runs the same contain
 2026-07-04T14:02:11.1002522Z stdout F 2. gRPC WeatherRequest result received
 2026-07-04T14:02:11.1002612Z stdout F 3. gRPC WeatherRequest result successful
  ```
-
+### Step 7 - Delete the ACR
+- The Azure Container App (ACA) does not need the Azure Container Regsitry (ACR) once it has been created and "contians" the image.
+- The ACR costs **c.£3.50 per month* to keep running.
+- If the ACA needs a new image in the future the ACR can be recreated from the steps above.
+- **BUT** The image can also be hosted **FREE** (and pulled into the ACA) from Docker Hub
