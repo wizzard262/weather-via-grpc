@@ -124,4 +124,16 @@ These logs look exactly like local Docker logs because ACA runs the same contain
   _N.B. Only if it stays ACTIVE (Min replicas > 0. If its set to zero then awaking a new replica (via PING) needs to get the Contianer Image from:_
   		- ACR (can be deleted and later recreated)
   		- Docker Hub Image Repository (hosted **FREE** and pulled into the ACA)
-- todo: steps tosetup Docker Hub
+  
+### Step 8 - Push Container Image to Docker Hub Repository
+- Login to Docker Desktop as username: _judooctopus_
+- Terminal --> ```docker images```
+- Choose an image from the list to rename and set to: ```docker tag weather-service:latest judooctopus/weather-service:latest```
+- ```docker images``` now lists the new image: _judooctopus/weather-service:latest_
+  _(N.B. it must start with a "docker_username/")_
+- Push the image to Docker Hub: ```docker push judooctopus/weather-service:latest```
+- See now the image has an repo address of : https://hub.docker.com/r/judooctopus/weather-service  
+  and can be see in Docker Desktop --> Images --> MyHub
+  
+### Step 9 - Set ACA to use Docker Hub Container Image
+ste:todo
