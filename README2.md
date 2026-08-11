@@ -136,4 +136,9 @@ These logs look exactly like local Docker logs because ACA runs the same contain
   and can be see in Docker Desktop --> Images --> MyHub
   
 ### Step 9 - Set ACA to use Docker Hub Container Image
-ste:todo
+* Azure Portal --> Container App --> "container-app-weather" --> Containers  
+* Change Image Source from "Azure Container Regsitry" to "Docker Hub or other registries"  
+* Image type: "Public"
+* Registry login server: "docker.io"
+* Image and tag: "judooctopus/weather-service:latest"
+* SAVE AS NEW REVISION _(This failed, had to recreate the whole Container App)_
