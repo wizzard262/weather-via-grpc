@@ -7,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
+// shared REST HttpClient and gRPC channel for the /weatherbenchmark speed test
+builder.Services.AddSingleton<WeatherApi.Benchmark.BenchmarkClients>();
+
 //========= WEB APPLICATION =========
 var app = builder.Build();
 

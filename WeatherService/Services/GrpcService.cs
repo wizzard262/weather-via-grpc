@@ -69,5 +69,30 @@ public class GrpcService
                 WeatherDescription = "OK"
             });
         }
+
+        // endpoint : /WeatherService/EchoForecast
+        // Large payload for speed test: returns `count` forecast points (same data as REST /forecast-echo)
+        public override Task<ForecastResponse> EchoForecast(ForecastRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(ForecastData.GetGrpc(request.Count));
+        }
+
+        // endpoint : /WeatherService/StreamForecast
+        // Same forecast as EchoForecast, but sent as a server stream, one point per message.
+        // Points are flushed to the network in batches of StreamFlushEvery, so the client gets its first
+        // points straight away without paying for a network flush on every single point.
+        public const int StreamFlushEvery = 100;
+        private static readonly WriteOptions BufferedWrite = new(WriteFlags.BufferHint);
+
+        public override async Task StreamForecast(ForecastRequest request, IServerStreamWriter<ForecastPoint> responseStream, ServerCallContext context)
+        {
+            var points = ForecastData.GetGrpc(request.Count).Points;
+            for (int i = 0; i < points.Count; i++)
+            {
+                // null = normal write (flushes), BufferHint = hold back until the next flush
+                responseStream.WriteOptions = (i + 1) % StreamFlushEvery == 0 ? null : BufferedWrite;
+                await responseStream.WriteAsync(points[i]);
+            }
+        }
     }
 }

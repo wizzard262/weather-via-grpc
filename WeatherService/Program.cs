@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Net;
 using WeatherService.Models;
+using WeatherService.Services;
 using static WeatherService.Services.GrpcService;
 
 //=============== BUILDER ==========================
@@ -56,6 +57,10 @@ app.MapGet("/weather-echo", (double latitude, double longitude) =>
 {
     return CurrentDataInstance.CurrentData;
 });
+
+// REST endpoint (HTTP/1.1) - echoes a made-up hourly forecast of `count` points as JSON, for speed test.
+// Same data as the gRPC EchoForecast endpoint. i.e. /forecast-echo?count=1000
+app.MapGet("/forecast-echo", (int count) => ForecastData.GetRest(count));
 
 // Map gRPC ensure it stays on HTTP/2
 app.MapGrpcService<WeatherGrpcService>().EnableGrpcWeb();

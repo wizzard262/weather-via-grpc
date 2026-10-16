@@ -9,7 +9,27 @@
 
         <div class="bg-secondary bg-opacity-10 p-3 border rounded">
             <h2>Benchmark gRPC vs. HTTP REST</h2>
-            <a href="/weatherbenchmark" target="_blank"> Run gRPC vs. HTTP REST Benchmark</a>
+            <a href="/weatherbenchmark" target="_blank"> Run gRPC vs. HTTP REST Benchmark</a> <i>(takes about 10-30 seconds)</i>
+            <p class="mt-2 mb-1">
+                The client fetches the same made-up hourly weather forecast from the server over REST (HTTP/1.1 + JSON) and over gRPC (HTTP/2 + Protobuf), and times each call.<br />
+                Each forecast point has 12 fields (a time, 10 decimal numbers and a weather code), named like Open-Meteo's hourly forecast.
+                The server holds the data in memory, and both clients parse the reply into typed C# objects, so only the protocol and data format differ.
+            </p>
+            <ul class="mb-1">
+                <li><b>Size sweep:</b> 1, 100, 1,000 and 10,000 points per reply, 20 timed calls each after 3 untimed warm-up calls, REST and gRPC taking turns.</li>
+                <li><b>Parallel burst:</b> 100 calls at once (1,000 points each), with new connections and then with connections reused.</li>
+                <li><b>Streaming:</b> 10,000 points as one JSON document vs a gRPC server stream; how soon the first point arrives.</li>
+            </ul>
+            <p class="mb-1">
+                Why the sizes matter: a tiny reply is almost all network round trip, so REST and gRPC tie (the first version of this benchmark only echoed 3 fields).
+                With thousands of points JSON is about 3&times; bigger and slower to write and parse, and gRPC pulls ahead.
+            </p>
+            <p class="mb-0">
+                Change the settings in the address bar:
+                <code>sizes</code> (points per reply, up to 50,000), <code>iterations</code>, <code>warmup</code>, <code>parallel</code>, <code>parallelSize</code> and <code>streamSize</code>,
+                i.e. <a href="/weatherbenchmark?sizes=1000,10000,50000&iterations=10" target="_blank">/weatherbenchmark?sizes=1000,10000,50000&amp;iterations=10</a>.
+                The results page explains every setting and why it has that value.
+            </p>
         </div>
         <br />
         <div class="bg-secondary bg-opacity-10 p-3 border rounded">

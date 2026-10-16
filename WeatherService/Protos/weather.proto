@@ -20,10 +20,42 @@ message WeatherResponse {
   string weather_description = 3;
 }
 
+// Speed test: ask for a made-up hourly forecast of `count` points
+message ForecastRequest {
+  int32 count = 1;
+}
+
+// Speed test: one hour of forecast (field names as Open-Meteo's hourly variables)
+message ForecastPoint {
+  int64 unix_time = 1;
+  double temperature_2m = 2;
+  double apparent_temperature = 3;
+  double relative_humidity_2m = 4;
+  double dew_point_2m = 5;
+  double precipitation = 6;
+  double pressure_msl = 7;
+  double cloud_cover = 8;
+  double wind_speed_10m = 9;
+  double wind_direction_10m = 10;
+  double wind_gusts_10m = 11;
+  int32 weather_code = 12;
+}
+
+// Speed test: the whole forecast in one reply
+message ForecastResponse {
+  repeated ForecastPoint points = 1;
+}
+
 // gRPC service definition
 service WeatherService {
   rpc GetWeather (WeatherRequest) returns (WeatherResponse);
 
 // New minimal echo endpoint, for speed test
 rpc EchoWeather (google.protobuf.Empty) returns (WeatherResponse);
+
+// Large payload echo endpoint, for speed test (same data as REST /forecast-echo)
+rpc EchoForecast (ForecastRequest) returns (ForecastResponse);
+
+// Same forecast sent as a server stream, one point per message, for speed test
+rpc StreamForecast (ForecastRequest) returns (stream ForecastPoint);
 }
