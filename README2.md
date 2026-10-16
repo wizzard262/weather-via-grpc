@@ -142,3 +142,18 @@ These logs look exactly like local Docker logs because ACA runs the same contain
 * Registry login server: "docker.io"
 * Image and tag: "judooctopus/weather-service:latest"
 * SAVE AS NEW REVISION _(This failed, had to recreate the whole Container App)_
+
+### Step 10 - Redeploy the server after a code change (current setup: Docker Hub)
+The Container App runs **docker.io/judooctopus/weather-service**. The server pipeline only checks the code and image build; deploying is done by hand.
+Use a new tag each time (i.e. the date and commit) so the Container App pulls the new image into a new revision.
+
+```
+cd C:\DEV\Repositories\GitHub\weather-via-grpc\WeatherService\
+docker login -u judooctopus
+docker build -t judooctopus/weather-service:v20261016-abc1234 -t judooctopus/weather-service:latest .
+docker push judooctopus/weather-service:v20261016-abc1234
+docker push judooctopus/weather-service:latest
+az containerapp update -n container-app-weather -g ResourceGroup1 --image docker.io/judooctopus/weather-service:v20261016-abc1234
+```
+- Check: https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/ping
+- Then run the benchmark from the client: https://grpc-weather-client-hhfmhrbhemavfte3.uksouth-01.azurewebsites.net/weatherbenchmark

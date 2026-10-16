@@ -6,27 +6,25 @@ trigger:
     include:
       - WeatherService/**
 
+# The server runs in the Azure Container App "container-app-weather" from the Docker Hub image
+# judooctopus/weather-service. This pipeline checks the code and the Docker image still build.
+# (It used to deploy to the App Service "grpc-weather-server", which no longer exists.)
+# Deploying a new image is done by hand: see "Redeploy Server image after code change" in README2.md.
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 steps:
 - checkout: self
   clean: true
 
-# 1. Publish WeatherService to ArtifactStagingDirectory
+# 1. Build the C# server
 - task: DotNetCoreCLI@2
-  displayName: 'Publish WeatherService (no zip)'
+  displayName: 'Build WeatherService'
   inputs:
-    command: 'publish'
+    command: 'build'
     projects: 'WeatherService/WeatherService.csproj'
-    publishWebProjects: false
-    arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/publish'
+    arguments: '--configuration Release'
 
-# 2. Deploy the published folder directly (WebDeploy)
-- task: AzureWebApp@1
-  displayName: 'Deploy WeatherService (folder deploy)'
-  inputs:
-    azureSubscription: 'AzureServiceConnection'
-    appName: 'grpc-weather-server'
-    appType: 'webApp'
-    package: '$(Build.ArtifactStagingDirectory)/publish'
+# 2. Build the Docker image the Container App runs (not pushed)
+- script: docker build -t weather-service:$(Build.BuildId) WeatherService
+  displayName: 'Build WeatherService Docker image'
