@@ -1,8 +1,13 @@
 steps:
+# Publish only the client. publishWebProjects defaults to true, which ignores 'projects' and publishes
+# every web project (the server too), and the deploy step then copied the two zips without unpacking them.
 - task: DotNetCoreCLI@2
+  displayName: 'Publish WeatherApi (client)'
   inputs:
     command: 'publish'
     projects: 'WeatherApi/WeatherApi.csproj'
+    publishWebProjects: false
+    zipAfterPublish: true
     arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/WeatherApi'
 
 - task: PublishBuildArtifacts@1
@@ -10,9 +15,12 @@ steps:
     pathToPublish: '$(Build.ArtifactStagingDirectory)/WeatherApi'
     artifactName: 'weatherapi'
 
+# The App Service is Windows. Run From Package mounts the zip as the site, so no files are locked while deploying.
 - task: AzureWebApp@1
+  displayName: 'Deploy WeatherApi (client)'
   inputs:
     azureSubscription: 'AzureServiceConnection'
     appName: 'grpc-weather-client'
-    appType: 'webAppLinux'
-    package: '$(Build.ArtifactStagingDirectory)/WeatherApi'
+    appType: 'webApp'
+    package: '$(Build.ArtifactStagingDirectory)/WeatherApi/*.zip'
+    deploymentMethod: 'runFromPackage'
