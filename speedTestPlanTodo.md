@@ -199,3 +199,15 @@ Streaming 10,000 points: first gRPC point after 0.6 ms, whole REST document afte
 Parallel burst (100 x 1,000 points): REST 972 ms vs gRPC 342 ms cold, 963 ms vs 400 ms warm.
 Streaming 10,000 points: first gRPC point after 1.5 ms, whole REST document after 105 ms.
 Timings jump about between runs because the 0.25 CPU cap throttles in bursts; the byte sizes never change.
+
+## Live on Azure (App Service client to Container App server, 2026-10-16)
+| Points | REST median | gRPC median | Result |
+|---|---|---|---|
+| 1 | 2.88 ms | 2.99 ms | About the same |
+| 100 | 4.36 ms | 3.76 ms | gRPC 1.2x faster |
+| 1,000 | 93.1 ms | 42.3 ms | gRPC 2.2x faster |
+| 10,000 | 518 ms | 82.5 ms | gRPC 6.3x faster (8.9x on another run) |
+| 50,000 | 1,779 ms | 625 ms | gRPC 2.8x faster |
+
+Parallel burst (100 x 1,000 points): REST 4,246 ms vs gRPC 1,610 ms cold, 1,510 ms vs 495 ms warm.
+Streaming 10,000 points: first gRPC point after 3.3 ms, whole REST document after 415 ms.
