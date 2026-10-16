@@ -486,3 +486,18 @@ td code {
         color: var(--muted);
     }
 }
+
+/* Expandable extra detail */
+details {
+    margin: 8px 0;
+}
+
+summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+details .result {
+    margin-top: 8px;
+}

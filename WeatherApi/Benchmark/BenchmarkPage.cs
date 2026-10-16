@@ -108,8 +108,27 @@ public static class BenchmarkPage
         html.Append("""
             <section class="card card-wide" aria-labelledby="sweep-title">
                 <h2 id="sweep-title">1. Reply size sweep <small>one call at a time</small></h2>
-                <p class="muted">Each row fetches a forecast of that many points. Times are per call, from sending the request to having typed C# objects.
-                    The result compares the medians.</p>
+                <p class="muted">Each row fetches a forecast of that many points. A <b>point</b> is one hour of forecast with 12 fields, so 10,000 points is about 14 months of hours.
+                    Times are per call, from sending the request to having typed C# objects. The result compares the medians.</p>
+                <details class="small">
+                    <summary>See one point</summary>
+                    <pre class="result">{
+              "unix_time": 1767225600,
+              "temperature_2m": 20.84,
+              "apparent_temperature": 18.82,
+              "relative_humidity_2m": 33.28,
+              "dew_point_2m": 10.99,
+              "precipitation": 1.31,
+              "pressure_msl": 984.53,
+              "cloud_cover": 80.21,
+              "wind_speed_10m": 26.73,
+              "wind_direction_10m": 80.99,
+              "wind_gusts_10m": 1.01,
+              "weather_code": 71
+            }</pre>
+                    <p class="muted">About 290 bytes as JSON: every field name is repeated in every point, and numbers are written as text.
+                        The same point in Protobuf is about 98 bytes: each field name becomes a 1-byte field number and each decimal is 8 fixed bytes.</p>
+                </details>
                 <div class="table-wrap"><table>
                     <tr><th class="num">Points</th><th class="num">JSON size</th><th class="num">Protobuf size</th><th class="num">Size ratio</th>
                         <th class="num">REST median</th><th class="num">REST p95</th><th class="num">gRPC median</th><th class="num">gRPC p95</th><th>Result</th></tr>

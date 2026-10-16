@@ -61,7 +61,7 @@
         <section class="card card-wide" aria-labelledby="benchmark-title">
             <h2 id="benchmark-title">Benchmark: gRPC vs REST</h2>
             <p>The client fetches the same made-up hourly weather forecast from the server over REST (HTTP/1.1 + JSON) and over gRPC (HTTP/2 + Protobuf), and times each call.
-                Each forecast point has 12 fields (a time, 10 decimal numbers and a weather code), named like Open-Meteo's hourly forecast.
+                Each <b>point</b> is one hour of forecast: 12 fields (a time, 10 decimal numbers and a weather code), named like Open-Meteo's hourly forecast, so 10,000 points is about 14 months of hours. One point is about 290 bytes as JSON and 98 bytes as Protobuf.
                 The server holds the data in memory, and both clients parse the reply into typed C# objects, so only the protocol and data format differ.</p>
 
             <h3>Three tests</h3>
