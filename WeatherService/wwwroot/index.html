@@ -1,29 +1,163 @@
-﻿<html>
+﻿<!DOCTYPE html>
+<html lang="en">
+
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>gRPC Weather Server</title>
+    <meta name="description" content="A C# gRPC service that serves weather data from Open-Meteo, hosted in an Azure Container App.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b7f78'/%3E%3Ctext x='16' y='21' font-family='Arial' font-weight='700' font-size='11' fill='white' text-anchor='middle'%3EgRPC%3C/text%3E%3C/svg%3E">
+    <!-- Styles inline: this server only serves this one page. Same look as the client's wwwroot/styles.css -->
+    <style>
+        :root {
+            --bg: #f3f7f7;
+            --surface: #ffffff;
+            --text: #1a2a2e;
+            --muted: #5a6d72;
+            --border: #d9e4e5;
+            --accent: #0b7f78;
+            --accent-strong: #08615b;
+            --accent-soft: #e0f3f1;
+            --hero-from: #14a89d;
+            --hero-to: #0b4f6c;
+            --shadow: 0 1px 2px rgba(16, 40, 44, 0.06), 0 4px 16px rgba(16, 40, 44, 0.06);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0e1719;
+                --surface: #162326;
+                --text: #e4eeef;
+                --muted: #97abaf;
+                --border: #25373b;
+                --accent: #4fd8cc;
+                --accent-strong: #8ce8df;
+                --accent-soft: #123331;
+                --hero-from: #0a7a72;
+                --hero-to: #0a2a38;
+                --shadow: none;
+            }
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        a { color: var(--accent); }
+        a:hover { color: var(--accent-strong); }
+
+        code {
+            font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+            font-size: 0.9em;
+            background: var(--accent-soft);
+            padding: 0.1em 0.35em;
+            border-radius: 5px;
+            word-break: break-word;
+        }
+
+        .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+
+        .hero {
+            background: linear-gradient(135deg, var(--hero-from), var(--hero-to));
+            color: #fff;
+            padding: 44px 0 40px;
+        }
+
+        .hero h1 { margin: 0 0 8px; font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.15; }
+        .eyebrow { margin: 0 0 8px; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.85; }
+        .lead { margin: 0; max-width: 680px; font-size: 1.1rem; opacity: 0.95; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+            gap: 20px;
+            margin-top: -20px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            padding: 22px;
+            min-width: 0;
+        }
+
+        .card h2 { margin: 0 0 6px; font-size: 1.25rem; }
+        .muted { color: var(--muted); }
+
+        .facts { margin: 12px 0 0; }
+        .facts div { padding: 8px 0; border-top: 1px solid var(--border); }
+        .facts div:first-child { border-top: 0; }
+        .facts dt { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+        .facts dd { margin: 0; word-break: break-word; }
+
+        .footer { padding-top: 28px; padding-bottom: 40px; color: var(--muted); font-size: 0.9rem; }
+    </style>
 </head>
+
 <body>
-    <div class="p-3">
-        <h1>gRPC (gRPC Remote Procedure Call) - SERVER</h1>
-        <br />
-        <div class="bg-secondary bg-opacity-10 p-3 border rounded">
-            <h2>GET WEATHER Via gRPC</h2>
-            <ul>
-                <li>This is a C# API <b>WeatherService - server</b> <i>(with this static HTML page at the root)</i> hosted within a Container App <i>(to enable HTTP2 gRPC calls)</i></li>
-                <li>Its purpose is to serve Weather Data via a  gRPC endpoint</li>
-                <li>
-                    An HTTP GET copy of the gRPC endpoint can be access at: <a href="/weather?latitude=53.41&longitude=-2.15">/weather?latitude=53.41&longitude=-2.15</a> <br/>
-                    <i>(To see the Open Meteo weather lookup works and to see what he expected data looks like)</i>
-                </li>
-                <li>
-                    A Ping can be called to see server is alive<a href="/ping">/ping</a><br />
-                </li>
-                <li>Hosted on Azure at: <a href="https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/">https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/</a></li>
-                <li>A C# <b>WeatherApi - client</b> calls this service via gRPC to get weather data</li>
-                <li>Both <b>WeatherApi - client</b> and  <b>WeatherService - server</b> in a repo at : <a href="https://github.com/wizzard262/weather-via-grpc" target="_blank">https://github.com/wizzard262/weather-via-grpc</a></li>
-                <li>All other project info is on a root page of the <b>WeatherApi - client</b> <a href="https://grpc-weather-client-hhfmhrbhemavfte3.uksouth-01.azurewebsites.net" target="_blank">grpc-weather-client-hhfmhrbhemavfte3.uksouth-01.azurewebsites.net</a></li>
-            </ul>
+    <header class="hero">
+        <div class="wrap">
+            <p class="eyebrow">C# .NET 10 &middot; gRPC &middot; Azure Container Apps</p>
+            <h1>gRPC Weather Server</h1>
+            <p class="lead">A C# service that serves weather data via gRPC. It runs in an Azure Container App, which supports the HTTP/2 that gRPC needs.
+                A separate C# client calls it.</p>
         </div>
-    </div>
+    </header>
+
+    <main class="wrap grid">
+        <section class="card" aria-labelledby="endpoints-title">
+            <h2 id="endpoints-title">Endpoints</h2>
+            <dl class="facts">
+                <div>
+                    <dt>gRPC WeatherService.GetWeather</dt>
+                    <dd>The current weather from Open-Meteo, in Protobuf. Called by the client.</dd>
+                </div>
+                <div>
+                    <dt>GET <a href="/weather?latitude=53.41&amp;longitude=-2.15">/weather?latitude=53.41&amp;longitude=-2.15</a></dt>
+                    <dd>An HTTP copy of the gRPC endpoint, to check the Open-Meteo lookup works and see what the data looks like.</dd>
+                </div>
+                <div>
+                    <dt>GET <a href="/ping">/ping</a></dt>
+                    <dd>Checks the server is alive. It also wakes it up: the server sleeps when idle, and a gRPC call alone won't wake it.</dd>
+                </div>
+                <div>
+                    <dt>Benchmark endpoints</dt>
+                    <dd>REST <a href="/forecast-echo?count=2"><code>/forecast-echo?count=N</code></a> and gRPC <code>EchoForecast</code> / <code>StreamForecast</code>
+                        return the same made-up forecast, for the client's gRPC vs REST benchmark.</dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="card" aria-labelledby="about-title">
+            <h2 id="about-title">About</h2>
+            <dl class="facts">
+                <div>
+                    <dt>Client (all other project info)</dt>
+                    <dd><a href="https://grpc-weather-client-hhfmhrbhemavfte3.uksouth-01.azurewebsites.net" target="_blank" rel="noopener">gRPC Weather Client</a></dd>
+                </div>
+                <div>
+                    <dt>This server</dt>
+                    <dd><a href="https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/">container-app-weather</a> (Azure Container App)</dd>
+                </div>
+                <div>
+                    <dt>Code</dt>
+                    <dd><a href="https://github.com/wizzard262/weather-via-grpc" target="_blank" rel="noopener">github.com/wizzard262/weather-via-grpc</a></dd>
+                </div>
+            </dl>
+        </section>
+    </main>
+
+    <footer class="wrap footer">
+        <p>Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></p>
+    </footer>
 </body>
+
 </html>

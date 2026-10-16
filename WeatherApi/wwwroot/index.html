@@ -1,256 +1,227 @@
-﻿<html>
+﻿<!DOCTYPE html>
+<html lang="en">
+
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>gRPC Weather Client</title>
+    <meta name="description" content="A C# client that gets the weather from a C# server via gRPC, and benchmarks gRPC against REST. Hosted on Azure.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b7f78'/%3E%3Ctext x='16' y='21' font-family='Arial' font-weight='700' font-size='11' fill='white' text-anchor='middle'%3EgRPC%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Protobuf.js: parses .proto text and decodes Protobuf bytes in the browser (used by the hex decoder) -->
+    <script src="https://unpkg.com/protobufjs@7.4.0/dist/protobuf.min.js" defer></script>
+    <script src="app.js" defer></script>
 </head>
+
 <body>
-    <div class="p-3">
-        <h1>gRPC (gRPC Remote Procedure Call) - CLIENT</h1>
+    <header class="hero">
+        <div class="wrap">
+            <p class="eyebrow">C# .NET 10 &middot; gRPC &middot; Protobuf &middot; Azure</p>
+            <h1>gRPC Weather Client</h1>
+            <p class="lead">This C# web app (the <b>client</b>) gets the weather from a separate C# service (the <b>server</b>) using gRPC,
+                Google's fast binary Remote Procedure Call framework. It also benchmarks gRPC against an ordinary REST call.</p>
+            <a class="button" href="/weatherbenchmark" target="_blank" rel="noopener">Run the gRPC vs REST benchmark</a>
+        </div>
+    </header>
 
+    <main class="wrap grid">
+        <section class="card card-wide" aria-labelledby="weather-title">
+            <h2 id="weather-title">Get the weather via gRPC</h2>
+            <p class="muted">This form calls the client's endpoint <a href="/weather?latitude=53.41&amp;longitude=-2.15" target="_blank" rel="noopener"><code>/weather?latitude=53.41&amp;longitude=-2.15</code></a>,
+                which calls the server via gRPC. The server asks <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> and replies in Protobuf.</p>
 
-        <div class="bg-secondary bg-opacity-10 p-3 border rounded">
-            <h2>Benchmark gRPC vs. HTTP REST</h2>
-            <a href="/weatherbenchmark" target="_blank"> Run gRPC vs. HTTP REST Benchmark</a> <i>(takes about 10-30 seconds)</i>
-            <p class="mt-2 mb-1">
-                The client fetches the same made-up hourly weather forecast from the server over REST (HTTP/1.1 + JSON) and over gRPC (HTTP/2 + Protobuf), and times each call.<br />
+            <div class="notice notice-info small">
+                <b>Server asleep?</b> It scales to zero when idle. An HTTP call like
+                <a href="https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/ping" target="_blank" rel="noopener">/ping</a>
+                wakes it, but a gRPC call won't, and fails instead. Ping first, then try again.
+            </div>
+
+            <div class="presets" role="group" aria-label="Places">
+                <button type="button" class="chip" data-lat="53.41" data-lon="-2.15">Stockport</button>
+                <button type="button" class="chip" data-lat="53.48" data-lon="-2.24">Manchester</button>
+                <button type="button" class="chip" data-lat="51.51" data-lon="-0.13">London</button>
+                <button type="button" class="chip" data-lat="40.71" data-lon="-74.01">New York</button>
+                <button type="button" class="chip" data-lat="-37.81" data-lon="144.96">Melbourne</button>
+            </div>
+
+            <form id="weather-form" class="form-row">
+                <label>Latitude
+                    <input type="number" id="latitude" step="any" min="-90" max="90" value="53.41" required>
+                </label>
+                <label>Longitude
+                    <input type="number" id="longitude" step="any" min="-180" max="180" value="-2.15" required>
+                </label>
+                <button type="submit" class="button">Get weather</button>
+            </form>
+
+            <pre id="weather-result" class="result" aria-live="polite">Pick a place or enter coordinates, then press Get weather.</pre>
+            <p class="muted small">The reply includes <code>raw_protobuf</code>: the exact bytes the server sent. It is copied into the decoder below.</p>
+        </section>
+
+        <section class="card card-wide" aria-labelledby="benchmark-title">
+            <h2 id="benchmark-title">Benchmark: gRPC vs REST</h2>
+            <p>The client fetches the same made-up hourly weather forecast from the server over REST (HTTP/1.1 + JSON) and over gRPC (HTTP/2 + Protobuf), and times each call.
                 Each forecast point has 12 fields (a time, 10 decimal numbers and a weather code), named like Open-Meteo's hourly forecast.
-                The server holds the data in memory, and both clients parse the reply into typed C# objects, so only the protocol and data format differ.
-            </p>
-            <ul class="mb-1">
+                The server holds the data in memory, and both clients parse the reply into typed C# objects, so only the protocol and data format differ.</p>
+
+            <h3>Three tests</h3>
+            <ul>
                 <li><b>Size sweep:</b> 1, 100, 1,000 and 10,000 points per reply, 20 timed calls each after 3 untimed warm-up calls, REST and gRPC taking turns.</li>
-                <li><b>Parallel burst:</b> 100 calls at once (1,000 points each), with new connections and then with connections reused.</li>
-                <li><b>Streaming:</b> 10,000 points as one JSON document vs a gRPC server stream; how soon the first point arrives.</li>
+                <li><b>Parallel burst:</b> 100 calls at once (1,000 points each), first with new connections, then with the connections reused.</li>
+                <li><b>Streaming:</b> 10,000 points as one JSON document vs a gRPC server stream: how soon the first point arrives.</li>
             </ul>
-            <p class="mb-1">
-                Why the sizes matter: a tiny reply is almost all network round trip, so REST and gRPC tie (the first version of this benchmark only echoed 3 fields).
-                With thousands of points JSON is about 3&times; bigger and slower to write and parse, and gRPC pulls ahead.
-            </p>
-            <p class="mb-0">
-                Change the settings in the address bar:
-                <code>sizes</code> (points per reply, up to 50,000), <code>iterations</code>, <code>warmup</code>, <code>parallel</code>, <code>parallelSize</code> and <code>streamSize</code>,
-                i.e. <a href="/weatherbenchmark?sizes=1000,10000,50000&iterations=10" target="_blank">/weatherbenchmark?sizes=1000,10000,50000&amp;iterations=10</a>.
-                The results page explains every setting and why it has that value.
-            </p>
-        </div>
-        <br />
-        <div class="bg-secondary bg-opacity-10 p-3 border rounded">
-            <h2>How gRPC Works</h2>
-            <p>
-                High-performance, open-source Remote Procedure Call (RPC) framework originally developed by Google. <br />
-                It allows an application to directly call a method on a server application located on a different machine as if it were a local object,<br />
-                making it a popular choice for microservices architectures. <a href="https://grpc.io/" target="_blank">https://grpc.io/</a>
-            </p>
-            <ul>
-                <li>
-                    <strong>Protocol Buffers (Protobuf):</strong> <br />
-                    Instead of text-based formats like JSON, gRPC uses <b>Protobuf</b> (a binary serialization format) to define the API and serialize structured data. <br />
-                    Payload sizes significantly smaller and parsing much faster. <a href="https://protobuf.dev/" target="_blank">https://protobuf.dev/</a>
-                </li>
-                <li>
-                    <strong>HTTP/2 Transport:</strong> <br />
-                    Uses HTTP/2. Enabling multiplexing (multiple requests on a single connection), header compression, and full bidirectional streaming.
-                </li>
-                <li>
-                    <strong>Contract-First Development:</strong> <br />
-                    <ul>
-                        <li>Define the API structure, methods, and data types in a <code>.proto</code> file.</li>
-                        <li>gRPC compiler automatically generates strongly-typed client and server code. <a href="https://grpc.io/docs/languages/" target="_blank">supported languages</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-        <br />
-        <div class="bg-secondary bg-opacity-10 p-3 border rounded">
-            <h2>GET WEATHER Via gRPC</h2>
-            <ul>
-                <li>This is a C# API <b>WeatherApi - client</b> <i>(with this static HTML page at the root)</i></li>
-                <li>Hosted on Azure at: <a href="https://grpc-weather-client-hhfmhrbhemavfte3.uksouth-01.azurewebsites.net" target="_blank">grpc-weather-client-hhfmhrbhemavfte3.uksouth-01.azurewebsites.net</a> (Windows OS)</li>
-                <li>The <b>WeatherApi - client</b> endpoint calls a <b>WeatherService - server</b> via gRPC</li>
-                <li><b>WeatherService - server</b> hosted at: <a href="https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/" target="_blank">https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/</a> (in a Container App)</li>
-                <li>Both <b>WeatherApi - client</b> and <b>WeatherService - server</b> built & deployed from AzureDevOps at: <a href="https://dev.azure.com/jones-steve/GprcWeather/_build" target="_blank">https://dev.azure.com/jones-steve/GprcWeather/_build</a></li>
-                <li>Both <b>WeatherApi - client</b> and <b>WeatherService - server</b> in a repo at : <a href="https://github.com/wizzard262/weather-via-grpc" target="_blank">https://github.com/wizzard262/weather-via-grpc</a></li>
-                <li>
-                    The <b>WeatherService - server</b> calls the FREE (no auth, key, tokens, signup) weather API <a href="https://open-meteo.com/" target="_blank">https://open-meteo.com/</a><br />
-                    with a path like  <a href="https://api.open-meteo.com/v1/forecast?latitude=53.41&longitude=-2.15&current=temperature_2m,weather_code" target="_blank">https://api.open-meteo.com/v1/forecast?latitude=53.41&longitude=-2.15&current=temperature_2m,weather_code</a><br />
-                    <b>Note:</b> This returns 2 data items we will use:
-                    <ul>
-                        <li><b>Current temperature:</b> <code>temperature_2m</code></li>
-                        <li>
-                            <b>Weather Code:</b>
-                            <code>
-                                weather_code
-                            </code>
-                            <br />
-                            (Note: this number corresponds to a lookup. Go to: <a href="https://open-meteo.com/en/docs#weathervariables" target="_blank">https://open-meteo.com/en/docs#weathervariables</a> and search for:<i>" WMO Weather interpretation codes"</i>)
-                        </li>
-                    </ul>
-                </li>
-                <li>The <b>WeatherService - server</b> responds to the <b>WeatherApi - client</b> via gRPC</li>
-                <li>The <b>WeatherApi - client</b> deserializes the gRPC message and displays the weather result (see form below)</li>
-                <li><b>Note:</b> The returned JSON data also includes the <code>raw_protobuf</code> for reference.</li>
-                <li>
-                    The proto contract <a href="https://localhost:7034/protos/weather.proto" target="_blank">weather.proto</a> is used by both the client and the server<br />
-                    It auto-generates C# code <i>(or whatever other supported language the service might be written in)</i> <br />
-                    It defines:
-                    <ul>
-                        <li><b>Proto Schema Language version:</b> <code>syntax = "proto3";</code></li>
-                        <li>
-                            <strong>Data contract:</strong>
-                            <code>WeatherRequest</code> and <code>WeatherResponse</code> define the exact fields, types, and field numbers used for exchanging data between client and server.
-                        </li>
-                        <li>
-                            <strong>Service contract:</strong>
-                            <code>WeatherService</code> with its <code>GetWeather</code> RPC defines the API interface:
-                            <ul>
-                                <li>Method name <code>GetWeather</code></li>
-                                <li>Request type <code>WeatherRequest</code></li>
-                                <li>Response type <code>WeatherResponse</code></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <strong>Wire contract:</strong>
-                            The field numbers (<code>= 1</code>, <code>= 2</code>) and types (<code>double</code>, <code>string</code>) define the binary Protobuf wire format, ensuring compatibility across languages and versions.
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-            <form id="weatherForm" class="border">
 
-                <b>N.B.</b> Ping the server to see it is alive: <a href="https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/ping" target="_blank">https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/ping</a>.<br />
-                If it is asleep this HTTP GET endpoint will wake it up.<br />
-                If it is asleep a gRPC call will not wake it up and will fail.<br /><br />
+            <h3>Why the sizes matter</h3>
+            <p>A tiny reply is almost all network round trip, so REST and gRPC tie (the first version of this benchmark only echoed 3 fields).
+                With thousands of points JSON is about 3&times; bigger and slower to write and parse, and gRPC pulls ahead.</p>
 
-                This form uses javascript to call the <b>WeatherApi - clients</b> HttpGet endpoint: <a href="/weather?latitude=53.41&longitude=-2.15" target="_blank">/weather?latitude=53.41&longitude=-2.15</a><br />
-                This then calls the <b>WeatherService - server</b> via gRPC to get the weather data
+            <h3>Settings</h3>
+            <p class="muted small">Change these in the address bar, i.e. <code>/weatherbenchmark?sizes=1000,10000,50000&amp;iterations=10</code>. The results page explains every setting and why it has that value.</p>
+            <div class="table-wrap">
                 <table>
-                    <tr>
-                        <td>Latitude:</td>
-                        <td><input type="text" id="latitude" value="53.41"></td>
-                    </tr>
-                    <tr>
-                        <td>Longitude:</td>
-                        <td><input type="text" id="longitude" value="-2.15"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="text-align:right;">
-                            <button type="submit">Get Weather</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="text-align:left;">
-                            <i>(default coords is Stockport, England)</i>
-                        </td>
-                    </tr>
+                    <tr><th>Setting</th><th>Default</th><th>What it does</th></tr>
+                    <tr><td><code>sizes</code></td><td>1,100,1000,10000</td><td>Forecast points per reply, one results row each (up to 6 sizes, each up to 50,000)</td></tr>
+                    <tr><td><code>iterations</code></td><td>20</td><td>Timed calls per protocol for each size</td></tr>
+                    <tr><td><code>warmup</code></td><td>3</td><td>Untimed calls first, to open connections and warm up</td></tr>
+                    <tr><td><code>parallel</code></td><td>100</td><td>Calls started at once in the burst test</td></tr>
+                    <tr><td><code>parallelSize</code></td><td>1000</td><td>Points per reply in the burst test</td></tr>
+                    <tr><td><code>streamSize</code></td><td>10000</td><td>Points in the streaming test</td></tr>
                 </table>
-            </form>
-            <b>Get Weather result:</b>
-            <pre id="weatherResult" class="alert alert-danger"></pre>
-        </div>
-        <br />
-        <div class="bg-secondary bg-opacity-10 p-3 border rounded">
-            <h2>Protobuf Hex Deserializer</h2>
-            <p>
-                Paste the <code>raw_protobuf</code> value from "GetWeather" <i>(see above)</i> to see the hexadecimal (i.e. binary) Protobuf message deserialized
-                into the <code>WeatherResponse</code>
-            </p>
+            </div>
 
-            <form id="protobufForm" class="border">
-                <table>
-                    <tr>
-                        <td>Raw Protobuf Hex:</td>
-                        <td><textarea id="hexInput" rows="1" style="width: 600px;">09 CD CC CC CC CC CC 37 40 10 03 1A 08 4F 76 65 72 63 61 73 74</textarea></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="text-align:right;">
-                            <button id="decodeBtn">Decode</button>
-                        </td>
-                    </tr>
-                </table>
+            <div class="presets" aria-label="Benchmark presets">
+                <a class="chip" href="/weatherbenchmark" target="_blank" rel="noopener">Default run</a>
+                <a class="chip" href="/weatherbenchmark?sizes=1,10,50&amp;iterations=50" target="_blank" rel="noopener">Tiny replies</a>
+                <a class="chip" href="/weatherbenchmark?sizes=1000,10000,50000&amp;iterations=10" target="_blank" rel="noopener">Big replies</a>
+                <a class="chip" href="/weatherbenchmark?parallel=200&amp;parallelSize=500" target="_blank" rel="noopener">Bigger burst</a>
+                <a class="chip" href="/weatherbenchmark?streamSize=50000" target="_blank" rel="noopener">Long stream</a>
+            </div>
+            <p class="muted small">A run takes about 10-30 seconds.</p>
+        </section>
+
+        <section class="card" aria-labelledby="grpc-title">
+            <h2 id="grpc-title">How gRPC works</h2>
+            <p>A high-performance, open-source Remote Procedure Call framework from Google (<a href="https://grpc.io/" target="_blank" rel="noopener">grpc.io</a>).
+                An app calls a method on a server on another machine as if it were a local object, which makes it popular for microservices.</p>
+            <ul>
+                <li><b>Protocol Buffers (Protobuf):</b> instead of text like JSON, data is sent in a compact binary format, so payloads are smaller and parse faster
+                    (<a href="https://protobuf.dev/" target="_blank" rel="noopener">protobuf.dev</a>).</li>
+                <li><b>HTTP/2:</b> many calls share one connection (multiplexing), headers are compressed, and both sides can stream.</li>
+                <li><b>Contract first:</b> the API's methods and data types are written in a <code>.proto</code> file, and the gRPC compiler generates
+                    strongly-typed client and server code in many <a href="https://grpc.io/docs/languages/" target="_blank" rel="noopener">languages</a>.</li>
+            </ul>
+        </section>
+
+        <section class="card" aria-labelledby="flow-title">
+            <h2 id="flow-title">How this demo works</h2>
+            <ol class="steps">
+                <li>The browser calls the <b>client</b> (this C# app) at <code>/weather</code>.</li>
+                <li>The client calls the <b>server</b> via gRPC: <code>WeatherService.GetWeather</code>.</li>
+                <li>The server calls the free Open-Meteo API (no sign-up or key):
+                    <a href="https://api.open-meteo.com/v1/forecast?latitude=53.41&amp;longitude=-2.15&amp;current=temperature_2m,weather_code" target="_blank" rel="noopener">forecast?&hellip;&amp;current=temperature_2m,weather_code</a>.</li>
+                <li>Open-Meteo returns the current temperature (<code>temperature_2m</code>) and a
+                    <a href="https://open-meteo.com/en/docs#weathervariables" target="_blank" rel="noopener">WMO weather code</a> (<code>weather_code</code>).</li>
+                <li>The server replies to the client via gRPC, in Protobuf.</li>
+                <li>The client turns the reply into JSON for the browser, with the raw Protobuf bytes alongside.</li>
+            </ol>
+        </section>
+
+        <section class="card card-wide" aria-labelledby="proto-title">
+            <h2 id="proto-title">The proto contract</h2>
+            <p><a href="/protos/weather.proto" target="_blank" rel="noopener"><code>weather.proto</code></a> is shared by the client and the server.
+                It generates the C# code on both sides (or code in any other supported language). It defines:</p>
+            <dl class="facts">
+                <div>
+                    <dt>Schema version</dt>
+                    <dd><code>syntax = "proto3";</code></dd>
+                </div>
+                <div>
+                    <dt>Data contract</dt>
+                    <dd><code>WeatherRequest</code> and <code>WeatherResponse</code>: the exact fields, types and field numbers sent between client and server.
+                        The benchmark adds <code>ForecastRequest</code>, <code>ForecastPoint</code> and <code>ForecastResponse</code>.</dd>
+                </div>
+                <div>
+                    <dt>Service contract</dt>
+                    <dd><code>WeatherService</code> and its methods: <code>GetWeather</code> takes a <code>WeatherRequest</code> and returns a <code>WeatherResponse</code>.
+                        The benchmark adds <code>EchoForecast</code> and the streaming <code>StreamForecast</code>.</dd>
+                </div>
+                <div>
+                    <dt>Wire contract</dt>
+                    <dd>The field numbers (<code>= 1</code>, <code>= 2</code>) and types (<code>double</code>, <code>string</code>) fix the binary format,
+                        so it stays compatible across languages and versions.</dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="card card-wide" aria-labelledby="decoder-title">
+            <h2 id="decoder-title">Protobuf hex decoder</h2>
+            <p class="muted">Paste the <code>raw_protobuf</code> value from <b>Get the weather via gRPC</b> to see the binary Protobuf message decoded into a <code>WeatherResponse</code>.</p>
+            <form id="protobuf-form" class="form-row">
+                <label>Raw Protobuf (hex)
+                    <textarea id="hex-input" rows="2">09 CD CC CC CC CC CC 37 40 10 03 1A 08 4F 76 65 72 63 61 73 74</textarea>
+                </label>
+                <button type="submit" class="button">Decode</button>
             </form>
-            <b>Decoded JSON</b>
-            <pre id="output" class="alert alert-danger"></pre>
-        </div>
-        <br />
-        <div class="bg-secondary bg-opacity-10 p-3 border rounded">
-            <h2>Draw.io Diagram</h2>
-            <p>Click to open full size in a  new tab</p>
-            <a href="images/diagram.png" target="_blank">
-                <img src="images/diagram.png" width="600px" />
+            <pre id="decoded" class="result" aria-live="polite">The decoded message will appear here.</pre>
+        </section>
+
+        <section class="card" aria-labelledby="endpoints-title">
+            <h2 id="endpoints-title">Client endpoints</h2>
+            <dl class="facts">
+                <div>
+                    <dt>GET /</dt>
+                    <dd>This page</dd>
+                </div>
+                <div>
+                    <dt>GET /weather?latitude=&hellip;&amp;longitude=&hellip;</dt>
+                    <dd>The weather, fetched from the server via gRPC</dd>
+                </div>
+                <div>
+                    <dt>GET /weatherbenchmark</dt>
+                    <dd>Runs the gRPC vs REST benchmark and shows the results</dd>
+                </div>
+                <div>
+                    <dt>GET /protos/weather.proto</dt>
+                    <dd>The proto contract</dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="card" aria-labelledby="about-title">
+            <h2 id="about-title">About</h2>
+            <dl class="facts">
+                <div>
+                    <dt>Client (this app)</dt>
+                    <dd>C# Web API on Azure App Service</dd>
+                </div>
+                <div>
+                    <dt>Server</dt>
+                    <dd>C# gRPC service in an Azure Container App (for HTTP/2):
+                        <a href="https://container-app-weather.thankfultree-2d5a04b9.uksouth.azurecontainerapps.io/" target="_blank" rel="noopener">container-app-weather</a></dd>
+                </div>
+                <div>
+                    <dt>Code</dt>
+                    <dd><a href="https://github.com/wizzard262/weather-via-grpc" target="_blank" rel="noopener">github.com/wizzard262/weather-via-grpc</a></dd>
+                </div>
+                <div>
+                    <dt>Build and deploy</dt>
+                    <dd><a href="https://dev.azure.com/jones-steve/GprcWeather/_build" target="_blank" rel="noopener">Azure DevOps pipelines</a></dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="card card-wide" aria-labelledby="diagram-title">
+            <h2 id="diagram-title">Diagram</h2>
+            <p class="muted">Click to open full size in a new tab.</p>
+            <a href="images/diagram.png" target="_blank" rel="noopener">
+                <img class="diagram" src="images/diagram.png" alt="System diagram: browser, WeatherApi client, WeatherService server and Open-Meteo">
             </a>
-        </div>
-    </div>
+        </section>
+    </main>
+
+    <footer class="wrap footer">
+        <p>Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></p>
+    </footer>
 </body>
+
 </html>
-
-<!-- Loads Protobuf.js library. Enables .proto parsing, message encoding/decoding, binary/JSON conversion directly in JavaScript. -->
-<script src="https://unpkg.com/protobufjs/dist/protobuf.min.js"></script>
-
-<script>
-    // WeatherForm
-    document
-        .getElementById("weatherForm")
-        .addEventListener("submit", async (e) => {
-            // prevent the default form submission
-            e.preventDefault();
-
-            // get latitude and  longitude valuesfrom the form
-            const latitude = document.getElementById("latitude").value;
-            const longitude = document.getElementById("longitude").value;
-
-            // call the API endpoint
-            const res = await fetch(`/weather?latitude=${latitude}&longitude=${longitude}`);
-            const json = await res.json();
-
-            // print out the result
-            document.getElementById("weatherResult").textContent =
-                JSON.stringify(json, null, 2);
-        });
-
-    // convert the hex string to a Uint8Array of bytes
-    function hexToBytes(hex) {
-        hex = hex.replace(/[^0-9a-fA-F]/g, "");
-        if (hex.length % 2 !== 0) {
-            throw new Error("Hex length must be even");
-        }
-        const bytes = new Uint8Array(hex.length / 2);
-        for (let i = 0; i < hex.length; i += 2) {
-            bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
-        }
-        return bytes;
-    }
-
-    // Inline .proto schema matching the WeatherResponse used in the C# API
-    const protoSource = `syntax = "proto3";
-                            message WeatherResponse {
-                                double temperature_2m = 1;
-                                int32 weather_code = 2;
-                                string weather_description = 3;
-                        }`;
-
-    // Decode the hex input to a Protobuf message and display the JSON representation
-    document
-        .getElementById("decodeBtn")
-        .addEventListener("click", async (e) => {
-            // prevent the default form submission
-            e.preventDefault();
-            const hex = document.getElementById("hexInput").value.trim();
-            const output = document.getElementById("output");
-            output.textContent = "Decoding...";
-
-            try {
-                const root = await protobuf.parse(protoSource).root;
-                const WeatherResponse = root.lookupType("WeatherResponse");
-
-                const bytes = hexToBytes(hex);
-                const message = WeatherResponse.decode(bytes);
-                const obj = WeatherResponse.toObject(message, {
-                    longs: String,
-                    enums: String,
-                    bytes: String
-                });
-
-                output.textContent = JSON.stringify(obj, null, 2);
-            } catch (err) {
-                output.textContent = "Error: " + err.message;
-            }
-        });
-</script>
